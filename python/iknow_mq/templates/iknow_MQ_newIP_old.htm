@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html id="wrap">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <script src="{{ url_for('static',filename='static/launchChrome.js') }}"></script>
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static',filename='static/styles.css') }}">
+  <script src="{{ url_for('static',filename='static/jquery.min.js') }}"></script>
+
+
+
+</head>
+<!-- <style> -->
+<!-- #OK { -->
+<!-- display : none; -->
+<!-- } -->
+<!-- #Fail { -->
+<!-- display : none; -->
+<!-- } -->
+<!-- </style> -->
+
+<script>
+var chat_id
+var All_Q
+var glossary_Q
+var abnormal_Q
+var Qsystem_Q
+var spec_Q
+var activity_Q
+var process_Q
+
+<!-- 使用者查詢問題 -->
+function MQ_Query(ID,CID)
+{
+console.log(ID)
+console.log(CID)
+var table = document.getElementById("HK_Table");
+<!-- 創造對話ID(紀錄使用者log用之流水編號) -->
+if (ID =='search_text')
+	{
+		var question = document.getElementById(ID).value;
+		chat_id = PERNR +'-'+ getCurrentTime().replace('-','').replace('-','').replace('-','').replace(/:/g,'');
+	}
+else 
+	{
+		var question = document.getElementById(ID).textContent;
+		if (CID==''){
+			chat_id = PERNR +'-'+ getCurrentTime().replace('-','').replace('-','').replace('-','').replace(/:/g,'');
+		}
+		else{
+			chat_id =CID.toString();
+		}
+	}
+console.log(chat_id)
+console.log(question)
+if (question=="")
+	{alert('請輸入查詢資料');}
+else 
+	{
+	
+	<!-- var myObj = { "Chat_ID":"XXXX", "user_ID":PERNR, "user_name":userChineseName, "user_question":question}; -->
+	var myObj = { "Chat_ID":chat_id,"Session_ID":sessionsId, "user_ID":PERNR, "user_name":userChineseName, "user_question":question};
+	var myJSON = JSON.stringify(myObj);
+	console.log(myJSON)
+	$.ajax	({
+			url: "http://tnvqis03/MQ8118/I_Know_MQ",
+			type: "POST",
+			data: myJSON,
+			success:function (returnData)
+					{
+					console.log(returnData)
+					    <!-- 引導回答 -->
+						if (returnData.answerType=='lead') 
+							{
+								document.getElementById("search_answer").innerHTML ='<p>你想詢問以下哪個問題?</p>';
+								var SelectAns=returnData.data
+								
+								for (i in SelectAns)
+								{
+									Btn_ID = "LeadQ" + i.toString() ;
+									console.log(Btn_ID) ;
+									<!-- AnsBot="<button id='" + Btn_ID + "' class='astext' onclick=\"MQ_Query(this.id)\">" + SelectAns[i].question +"</button><br><br>" ; -->
+									AnsBot="<button id='" + Btn_ID + "' class='astext' onclick=\"MQ_Query(this.id,'" + returnData.Chat_ID +"')\">" + SelectAns[i].question +"</button><br><br>" ;
+									console.log(AnsBot) ;
+									$('#search_answer').append(AnsBot) ;
+								}
+								AnsBot="<button id='Noanswer' class='astext' onclick=\"feedback(4)\">以上皆非</button><br><br>" ;
+								$('#search_answer').append(AnsBot) ;
+								document.getElementById("feedback_labal").style.display="none";//隱藏
+								document.getElementById("Great").style.display="none";//隱藏
+								document.getElementById("OK").style.display="none";//隱藏
+								document.getElementById("Fail").style.display="none";//隱藏
+								document.getElementById("user_suggest").style.display="none";//隱藏
+							}
+						<!-- 直接回答 -->
+						else 
+							{						
+							<!-- var AnsHTML='<p>Q:' + question +'<br>A:<br>' + JSON.stringify(returnData.data[0].answer) + '<br><a href=' + JSON.stringify(returnData.data[0].URL) + ' target ="_blank">網址連結</a></p>' ; -->
+							var AnsHTML
+							if (returnData.data[0].SOPNO=='' || returnData.data[0].SOPNO=='nan')
+							{
+								AnsHTML='<p><span style="color: red ;  font-weight: bold; background-color:#FFD382;">Q:</span><br>' 
+								+ question +'<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">A:</span><br>' 
+								+ returnData.data[0].answer + '<br>' ;
+							}
+							else
+							{
+								if (returnData.data[0].SOP=='' || returnData.data[0].SOP=='nan')
+								{
+									AnsHTML='<p><span style="color: red ;  font-weight: bold; background-color:#FFD382;">Q:</span><br>' 
+									+ question +'<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">A:</span><br>' 
+									+ returnData.data[0].answer + '<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">SOP:</span>' 
+									+ returnData.data[0].SOPNO + '<br>' ;
+								}
+								else
+								{
+									AnsHTML='<p><span style="color: red ;  font-weight: bold; background-color:#FFD382;">Q:</span><br>' 
+									+ question +'<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">A:</span><br>' 
+									+ returnData.data[0].answer + '<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">SOP:</span>' 
+									+ returnData.data[0].SOPNO + ' 章節' + returnData.data[0].SOP + '<br>' ;
+								}
+							
+							}
+							
+							if (returnData.data[0].URL=='' || returnData.data[0].URL=='nan')
+							{
+							 
+								AnsHTML=AnsHTML + '</p>' ;
+							}
+							else
+							{
+								<!-- AnsHTML='<p><span style="color: red ;  font-weight: bold; background-color:#FFD382;">Q:</span><br>' + question +'<br><br><span style="color: red ;  font-weight: bold; background-color:#FFD382;">A:</span><br>' + returnData.data[0].answer + '<br><a href=' + JSON.stringify(returnData.data[0].URL) + ' target ="_blank">網址連結</a></p>' ; -->
+								AnsHTML=AnsHTML + '<a href=' + JSON.stringify(returnData.data[0].URL) + ' target ="_blank">網址連結</a></p>' ;
+							}
+							document.getElementById("search_answer").innerHTML = AnsHTML ;
+							$('#history_answer').prepend('<hr>');
+							$('#history_answer').prepend(document.getElementById("search_answer").innerHTML);
+							document.getElementById("feedback_labal").style.display="";//隱藏
+							document.getElementById("Great").style.display="";//顯示
+							document.getElementById("OK").style.display="";//顯示
+							document.getElementById("Fail").style.display="";//顯示
+							document.getElementById("user_suggest").style.display="";//顯示
+							var x = document.getElementById("search_text");
+							x.value =""
+							}
+					},
+			error: function (xhr) {
+				alert('請確認資料檢查無誤' + xhr);
+				document.getElementById("feedback_labal").style.display="none";//隱藏
+				document.getElementById("Great").style.display="none";//隱藏
+				document.getElementById("OK").style.display="none";//隱藏
+				document.getElementById("Fail").style.display="none";//隱藏
+				document.getElementById("user_suggest").style.display="none";//隱藏
+				}
+			
+			})
+	}
+}
+<!-- 取得TOP5問題 -->
+$(function()
+{
+<!-- var myS = {"System":"MQ"}; -->
+var mySys = JSON.stringify({"System":"MQ"});
+console.log(mySys)
+
+$.ajax	({
+		url: "http://tnvqis03/MQ8118/I_Know_Top5",
+		type: "POST",
+		data: mySys,
+		success:function (MQ_Top)
+				{
+				console.log(MQ_Top)
+				All_Q=MQ_Top.All
+				glossary_Q=MQ_Top.glossary
+				abnormal_Q=MQ_Top.abnormal_handing
+				Qsystem_Q=MQ_Top.quality_system
+				spec_Q=MQ_Top.specification_judge
+				activity_Q=MQ_Top.quality_activity
+				process_Q=MQ_Top.process_production
+				},
+		error: function (xhr) 
+				{
+				console.log(xhr)
+				All_Q=["AERB 涵蓋類型有哪些","AERB TAT的規範是什麼","如何查詢DCC文件","台灣撥打其他Site短號","如何查詢生產良率"];
+				glossary_Q=["什麼是EOL","什麼是ND Filter","什麼是API","什麼是8D","什麼是ECRS","什麼是ECRSAA"];
+				abnormal_Q=["AERB 涵蓋類型有哪些","AERB TAT的規範是什麼","什麼是CAERB的風險度評分(RPN)","CAERB結案時，如何確認是否需啟動QBQ會議","IMP 系統如何進入"];
+				Qsystem_Q=["如何查詢DCC文件","如何查詢VLRR","什麼是VLRR","白血球倉別KY2為何","什麼是白血球"];
+				spec_Q=["何謂IIS","動態規格調整是包含什麼","Mura應該在什麼畫面下判定","什麼是紅燈右轉","何謂表面能(達因值)測試"];
+				activity_Q=["台灣撥打其他Site短號","如何預約電話會議","如何加入電話會議","何謂CRN ","如何補打卡"];
+				process_Q=["如何查詢生產良率","什麼是CT1/CT2","什麼是C檢","LCD 製程主要有哪些","何謂LCM 製程"];
+					
+				},
+		})
+
+})
+<!-- 依據不同類別切換Top5問題 -->
+$(function() {
+    $('input:radio[name="Q_Type"]').change(function() {
+        if ($(this).val() == 'All') {
+            document.getElementById("HotKey1").textContent=All_Q[0] ;
+			document.getElementById("HotKey2").textContent=All_Q[1] ;
+			document.getElementById("HotKey3").textContent=All_Q[2] ;
+			document.getElementById("HotKey4").textContent=All_Q[3] ;
+			document.getElementById("HotKey5").textContent=All_Q[4] ;
+		} else if ($(this).val() == 'glossary') {
+            document.getElementById("HotKey1").textContent=glossary_Q[0] ;
+			document.getElementById("HotKey2").textContent=glossary_Q[1] ;
+			document.getElementById("HotKey3").textContent=glossary_Q[2] ;
+			document.getElementById("HotKey4").textContent=glossary_Q[3] ;
+			document.getElementById("HotKey5").textContent=glossary_Q[4] ;
+		} else if ($(this).val() == 'quality_system') {
+            document.getElementById("HotKey1").textContent=Qsystem_Q[0] ;
+			document.getElementById("HotKey2").textContent=Qsystem_Q[1] ;
+			document.getElementById("HotKey3").textContent=Qsystem_Q[2] ;
+			document.getElementById("HotKey4").textContent=Qsystem_Q[3] ;
+			document.getElementById("HotKey5").textContent=Qsystem_Q[4] ;
+		} else if ($(this).val() == 'quality_activity') {
+            document.getElementById("HotKey1").textContent=activity_Q[0] ;
+			document.getElementById("HotKey2").textContent=activity_Q[1] ;
+			document.getElementById("HotKey3").textContent=activity_Q[2] ;
+			document.getElementById("HotKey4").textContent=activity_Q[3] ;
+			document.getElementById("HotKey5").textContent=activity_Q[4] ;
+		} else if ($(this).val() == 'abnormal_handing') {
+            document.getElementById("HotKey1").textContent=abnormal_Q[0] ;
+			document.getElementById("HotKey2").textContent=abnormal_Q[1] ;
+			document.getElementById("HotKey3").textContent=abnormal_Q[2] ;
+			document.getElementById("HotKey4").textContent=abnormal_Q[3] ;
+			document.getElementById("HotKey5").textContent=abnormal_Q[4] ;
+		} else if ($(this).val() == 'specification_judge') {
+            document.getElementById("HotKey1").textContent=spec_Q[0] ;
+			document.getElementById("HotKey2").textContent=spec_Q[1] ;
+			document.getElementById("HotKey3").textContent=spec_Q[2] ;
+			document.getElementById("HotKey4").textContent=spec_Q[3] ;
+			document.getElementById("HotKey5").textContent=spec_Q[4] ;
+			
+        } else {
+            document.getElementById("HotKey1").textContent=process_Q[0] ;
+			document.getElementById("HotKey2").textContent=process_Q[1] ;
+			document.getElementById("HotKey3").textContent=process_Q[2] ;
+			document.getElementById("HotKey4").textContent=process_Q[3] ;
+			document.getElementById("HotKey5").textContent=process_Q[4] ;
+        }
+    });
+});
+<!-- 使用者回饋問題正確性 -->
+function feedback(correct)
+{
+console.log(correct)
+var qfb=0
+var user_suggest=''
+if (correct==4) {
+ qfb=0
+}
+else {
+ qfb=correct
+ user_suggest=document.getElementById("user_suggest").value
+}
+if (user_suggest=='' & correct==0) 
+{
+	alert('請提供您的建議')
+}
+else
+{
+	var myfb = { "Chat_ID":chat_id,"feedback":qfb,"user_suggest":user_suggest};
+	var myfbJSON = JSON.stringify(myfb);
+	console.log(myfbJSON)
+	$.ajax	({
+			url: "http://tnvqis03/MQ8118/I_Know_MQ_FB",
+			type: "POST",
+			data: myfbJSON,
+			success:function (MQ_FB)
+					{
+					console.log(MQ_FB)
+					if (correct==1 | correct==3)
+					 {
+					  alert('感謝您的回饋')　
+					 }
+					else 
+					 {
+					  if (correct==4)
+					  {
+						document.getElementById("feedback_labal").style.display="";//隱藏
+						document.getElementById("Fail").style.display="";//顯示
+						document.getElementById("user_suggest").style.display="";//顯示
+						var x = document.getElementById("search_text");
+						x.value ="" ;
+						document.getElementById("search_answer").innerHTML = '<p></p>' ;
+						
+					  }
+					  else
+					  {
+						alert('感謝您的回饋,我們會進行改進')
+					  }
+					 }
+					},
+			error: function (xhr) {
+				alert('回饋失敗' + xhr);
+				},
+			})
+	if (correct!=4)
+	{
+		document.getElementById("feedback_labal").style.display="none";//隱藏
+		document.getElementById("Great").style.display="none";//隱藏
+		document.getElementById("OK").style.display="none";//隱藏
+		document.getElementById("Fail").style.display="none";//隱藏
+		document.getElementById("user_suggest").style.display="none";//隱藏
+		document.getElementById("user_suggest").value=''
+	}
+}
+}
+var PERNR='';
+var userChineseName='';
+var sessionsId='';
+$(document).ready(function () { 
+
+
+
+// Usage
+
+
+document.getElementById("feedback_labal").style.display="none";//隱藏
+document.getElementById("Great").style.display="none";//隱藏
+document.getElementById("OK").style.display="none";//隱藏
+document.getElementById("Fail").style.display="none";//隱藏
+document.getElementById("user_suggest").style.display="none";//隱藏
+
+$("input").keydown(function(event){  
+		if (event.keyCode === 13) {
+        document.getElementById("myBtn").click();
+			}
+      });  
+<!-- 取得登入者身分資料 -->
+UserID = '{{ userDict["UserID"]}}';
+userChineseName = '{{ userDict["userChineseName"]}}';
+PERNR = '{{ userDict["employeeid"]}}';
+OU = '{{ userDict["OU"]}}';
+DC = '{{ userDict["DC"]}}';
+department = '{{ userDict["department"]}}';
+console.log('UserID:'+UserID+' userChineseName:'+userChineseName+' PERNR:'+PERNR+' OU:'+OU+' DC:'+DC+' department:'+department)
+sessionsId = PERNR +'-'+ getCurrentTime().replace('-','').replace('-','').replace('-','').replace(/:/g,'');
+}
+)
+
+function getCurrentTime(){
+   var today = new Date();
+   y=today.getFullYear().toString().substr(2,2);
+   m=addZero(today.getMonth()+1, 2);
+   d=addZero(today.getDate(), 2);
+   h=addZero(today.getHours(), 2);
+   mi=addZero(today.getMinutes(), 2);
+   s=addZero(today.getSeconds(), 2);
+   <!-- ms=today.getMilliseconds(); -->
+   <!-- return y+'-'+m+'-'+d+'-'+h+':'+mi+':'+s+':'+ms; -->
+   return y+'-'+m+'-'+d+'-'+h+':'+mi+':'+s;
+}
+function addZero(x,n) {
+  while (x.toString().length < n) {
+    x = "0" + x;
+  }
+  return x;
+}
+
+function parse_query_string(query) {
+  var vars = query.split("&");
+  var query_string = {};
+  for (var i = 0; i < vars.length; i++) {
+	var pair = vars[i].split("=");
+	var key = decodeURIComponent(pair[0]);
+	var value = decodeURIComponent(pair[1]);
+	if (typeof query_string[key] === "undefined") {
+	  query_string[key] = decodeURIComponent(value);
+	} else if (typeof query_string[key] === "string") {
+	  var arr = [query_string[key], decodeURIComponent(value)];
+	  query_string[key] = arr;
+	} else {
+	  query_string[key].push(decodeURIComponent(value));
+	}
+  }
+  return query_string;
+}
+
+
+
+
+</script>
+<body>
+
+<P Align=center><img src="{{ url_for('static',filename='static/MQ_BG_new.png') }}" alt="MQI"></p>
+<!-- <h1 id="System_Logo_U">MQ小幫手</h1> -->
+<!-- <h1 id="System_Logo_L"> -->
+<!-- <span id="word0">i </span> -->
+<!-- <span id="word1">S</span> -->
+<!-- <span id="word2">u</span> -->
+<!-- <span id="word3">p</span> -->
+<!-- <span id="word4">p</span> -->
+<!-- <span id="word5">o</span> -->
+<!-- <span id="word6">r</span> -->
+<!-- <span id="word7">t</span> -->
+<!-- </h1> -->
+<!-- <h1 id="word7">t</h1> -->
+
+<div id="Html_BG">
+    <!-- <input id="search_text" height="100" type="search" name="q" -->
+    <!-- placeholder="輸入需求資訊..." size="100"> -->
+    <input id="search_text" type="search" placeholder="輸入需求資訊..." size="100">
+	<button id="myBtn" class="button" onclick="MQ_Query('search_text','')">查詢</button>
+</div>
+
+<br>
+<br>
+<br>
+<div id="Hot_QA">
+<div id="HotKey">
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C1" value="All" checked="checked">
+<label for="HK_C1">All</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C2" value="glossary">
+<label for="HK_C2">名詞定義</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C3" value="abnormal_handing">
+<label for="HK_C3">異常處理</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C4" value="specification_judge">
+<label for="HK_C4">規格判定</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C5" value="process_production">
+<label for="HK_C5">製程生產</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C6" value="quality_system">
+<label for="HK_C6">品質系統</label><br>
+<input class="HK_radio" type="radio" name="Q_Type" id="HK_C7" value="quality_activity">
+<label for="HK_C7">品質活動</label>
+</div>
+<br>
+<br>
+<table id="HK_Table">
+  <tr>
+    <th width="150px"><button class="button2" onclick="MQ_Query('HotKey1','')"><img src="{{ url_for('static',filename='static/search_icon.png') }}" alt="Q1"></button></th>
+	<th width="150px"><button class="button2" onclick="MQ_Query('HotKey2','')"><img src="{{ url_for('static',filename='static/search_icon.png') }}"  alt="Q2"></button></th>
+	<th width="150px"><button class="button2" onclick="MQ_Query('HotKey3','')"><img src="{{ url_for('static',filename='static/search_icon.png') }}"  alt="Q3"></button></th>
+	<th width="150px"><button class="button2" onclick="MQ_Query('HotKey4','')"><img src="{{ url_for('static',filename='static/search_icon.png') }}"  alt="Q4"></button></th>
+	<th width="150px"><button class="button2" onclick="MQ_Query('HotKey5','')"><img src="{{ url_for('static',filename='static/search_icon.png') }}"  alt="Q5"></button></th>
+  </tr>
+  <tr>
+    <td id="HotKey1">AERB 涵蓋類型有哪些</td>
+    <td id="HotKey2">AERB TAT的規範是什麼</td>
+    <td id="HotKey3">如何查詢DCC文件</td>
+	<td id="HotKey4">台灣撥打其他Site短號</td>
+	<td id="HotKey5">如何查詢生產良率</td>
+  </tr>
+  
+</table>
+</div>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<p id="Stand_QA_label">標準答案</p>
+<div id="search_answer">
+<p></p>
+</div>
+<ul class="feedback">
+  <li id="feedback_labal" style="font-weight:bold;color: green;font-size: 25px;font-family:Microsoft JhengHei;cursor: pointer;">回饋答案對你有幫助嗎? 滿意度選項: </li/>
+  <li><button id="Great" onclick="feedback(3)" ><img src="{{ url_for('static',filename='static/Great.png') }}" width="45" height="45" alt="Great_png"></button></li>
+  <li><button id="OK" onclick="feedback(1)" ><img src="{{ url_for('static',filename='static/OK.png') }}"  width="45" height="45" alt="OK_png"></button></li>
+  <li><button id="Fail" onclick="feedback(0)"><img src="{{ url_for('static',filename='static/Fail.png') }}"  width="45" height="45" alt="Fail_png"></button></li>
+</ul>
+<input id="user_suggest" type="search" placeholder="建議:可提供正確答案或建議新增之問項">
+<br>
+<br>
+<h3 id="History_QA_label">歷史紀錄</h3>
+<div id="history_answer">
+<p></p>
+</div>
+
+</body>
+</html>

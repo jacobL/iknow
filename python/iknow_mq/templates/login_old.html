@@ -1,0 +1,63 @@
+ <style>
+           *{
+           font-family:'微軟正黑體';
+           }
+           .grid-container {
+           display: grid;
+           grid-gap: 10px;
+           margin-top:5%;
+           margin-right:20%;
+           margin-left:20%;
+           background-color: rgba(10,10,10,0.1);
+           border:1px solid rgba(0,0,0,0.1);
+           padding-top:2.5%;
+           padding-bottom:2.5%;
+           padding-right:5%;
+           padding-left:5%;
+           box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px 0px;
+           }
+           .grid-container-row {
+           display: grid;
+           grid-template-columns: auto auto;
+           background-color: rgba(0,0,0,0.01);
+           border:1px solid rgba(0,0,0,0.1);
+           }
+           .login-button{
+           border:1px solid rgba(0,0,0,0.15);
+           background-color: rgba(0,0,0,0.1);
+           color: rgba(0,0,0,0.5);
+           }
+           .item{
+           padding:2.5px;
+           margin:0 auto;
+           text-align: center;
+           vertical-align: middle;
+           }
+           .input_email {
+           padding:5px;
+           width:100%;
+           margin-bottom:1.5%;
+           margin-top:1.5%;
+           }
+           .input_password{
+           padding:5px;width:100%;
+           margin-bottom:1.5%;
+           margin-top:1.5%;
+           }           
+</style>
+<body>
+         <div style="margin:auto 0;position: relative;top:2.5vmin;">
+         <form action='login' method='POST' class="grid-container" >
+                   
+         <h2>MQ小幫手</h2>
+         <div>
+         <div>
+         <span style="left:0;text-align:left;padding:5px;text-align:left;">使用者名稱</span><input class="input_email" type='text' name='UserID' id='UserID' placeholder='請輸入帳號' /><br>
+         <span style="left:0;padding:5px;">使用者密碼</span><input class="input_password" type='password' name='password' id='password' placeholder='請輸入密碼' />
+         </div>
+         </div>
+         <input type='submit' name='submit' value="登入" class="login-button" style="font-family:'微軟正黑體';font-size:20px;padding:5px;" />
+         </form>
+         </div>
+
+</body>

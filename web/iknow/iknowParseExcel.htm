@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+
+<!--script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"> 
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+<script>
+	var json_object = '';
+	var List = '';
+    var ExcelToJSON = function() {
+
+      this.parseExcel = function(file) {
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          var data = e.target.result;
+          var workbook = XLSX.read(data, {
+            type: 'binary'
+          });
+          workbook.SheetNames.forEach(function(sheetName) {
+            console.log('sheetName:'+sheetName)
+			jQuery( '#showtable' ).show();	
+            var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+			
+            json_object = JSON.stringify(XL_row_object); 
+			 
+			//json_object
+			List = JSON.parse(json_object);  
+			//console.log('JSON before delete:')
+			//console.log(JSON.stringify(List))
+			
+			var tablehead = '<tr>';
+			var tablebody = '';
+ 			
+			 
+			
+			//var columnList = ["Answer_NO", "System", "Question", "category main", "category sub", "Answer", "Keyword", "SOP chapter", "SOP No", "URL", "Enabled", "異動"];
+			var columnList = ["Answer_NO","Question","Answer","Keyword","SOP chapter","SOP No","URL","異動"];
+			//var columnWidth = [100,70,300,130,130,600,150,120,100,250,75,60];
+			var columnWidth = [100,300,600,150,120,100,250,60];
+			 
+			for(i = 0 ; i < columnList.length ; i++){
+				tablehead += '<th style="min-width:'+columnWidth[i]+'px;">'+columnList[i]+'</th>'	
+ 			}
+ 			
+			tablehead += '</tr>' 
+			jQuery( '#tablehead' ).html( tablehead )
+			
+			//內容
+			for(i = 0 ; i < List.length ; i++){
+				tablebody += '<tr>' 
+ 				for(j = 0 ; j < columnList.length ; j++){
+					if (List[i][columnList[j]] !== undefined){
+						tablebody += '<td style="min-width:'+columnWidth[j]+'px; ">'+List[i][columnList[j]]+'</td>';
+					}else{
+						tablebody += '<td style="min-width:'+columnWidth[j]+'px;"></td>';
+					}
+				}
+				tablebody += '</tr>'
+			}
+			
+			jQuery( '#tablebody' ).html( tablebody );
+			
+            //jQuery( '#xlx_json' ).val( json_object );
+			
+          })
+         };
+
+        reader.onerror = function(ex) {
+          console.log(ex);
+        };
+
+        reader.readAsBinaryString(file);
+      };
+  };
+
+  function handleFileSelect(evt) {    
+    var files = evt.target.files; // FileList object
+    var xl2json = new ExcelToJSON();
+    xl2json.parseExcel(files[0]);
+  }
+
+  function upload(){
+	unCheckCol = '';
+	unCheckCount = 0;
+ 
+	for(i = 1 ; i <= colName.length ; i++ ){
+		//alert(i+'.  '+$('#col'+i).is(":checked"));
+		if(!$('#col'+i).is(":checked")){
+			unCheckCol = unCheckCol+'['+colName[i-1]+']';
+			for(j = 0 ; j < List.length ; j++){
+				delete List[j][colName[i-1]] 
+			}
+			 
+		}
+		 
+	} 
+	console.log('JSON after delete:')
+	console.log(JSON.stringify(List))
+ 
+	
+	if(unCheckCol == ''){
+		alert('全部欄位都上傳!')
+	}else if(unCheckCount == colName.length){
+		alert('全部欄位都不上傳!')
+	}else{
+		alert('欄位 '+unCheckCol+' 取消上傳!');
+		 
+	} 
+  }
+ 
+</script>
+<body>
+<form enctype="multipart/form-data">
+    <input id="upload" type=file  name="files[]">
+</form>
+	
+	<div class="container" id='showtable' style="display:  ;">
+	  
+	   
+	  <input type="button" value="上傳" onclick="upload()">
+	  <table class="table table-bordered table-sm" style="width: 80%;">
+		<thead id='tablehead'>		  
+		</thead>
+		<tbody id='tablebody'>		 
+		</tbody>
+	  </table>
+	</div>
+    <!--textarea class="form-control" rows=35 cols=120 id="xlx_json"></textarea-->
+	
+    <script>
+        document.getElementById('upload').addEventListener('change', handleFileSelect, false);
+    </script>
+</body>	
+</html>

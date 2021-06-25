@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<script src="http://smartdoe.cminl.oa/launchChrome.js?v=1811140812"></script>
+<html lang="en">
+<head>
+<title>IKnow Admin</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="">
+<meta name="author" content=""> 
+<!--script src="../js/launchChrome_NEW.js"></script-->
+<!--script src="../js/coq/3.1.1/jquery.js"></script-->
+<script src="../js/coq/bootstrap.bundle.min.js"></script>
+<script src="../js/coq/amcharts/amcharts.js"></script> 
+<script src="../js/coq/amcharts/serial.js"></script> 
+<script src="../js/coq/amcharts/light.js"></script>  
+ 
+<link rel="stylesheet" href="../css/coq/font-awesome.min.css">  
+
+<script src="../js/coq/coqJS.js"></script>
+
+<link href="../css/coq/bootstrap.min.css" rel="stylesheet"> 
+<link rel="stylesheet" href="../css/coq/qaSTDUITemplate.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<!-- parseExcel -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script> 
+<!-- parseExcel --> 
+<style>
+body {
+  line-height:1.2
+}
+.chart {
+  width: 100%;
+  height: 550px;
+}
+
+.card {
+  border: 0px;
+}
+.card-body{
+  padding: 0px
+}
+.col-md-4, .col-md-8 {
+  padding-right: 5px;
+  padding-left: 0px
+}
+</style>
+
+
+<script>
+var json_object = '';
+var List = '';
+var ExcelToJSON = function() {
+
+  this.parseExcel = function(file) {
+	var reader = new FileReader();
+
+	reader.onload = function(e) {
+	  var data = e.target.result;
+	  var workbook = XLSX.read(data, {
+		type: 'binary'
+	  });
+	  workbook.SheetNames.forEach(function(sheetName) {
+		console.log('sheetName:'+sheetName)
+		if(sheetName == '標準題'){
+			jQuery( '#showtable' ).show();	
+			var XL_row_object = XLSX.utils.sheet_to_row_object_array(workbook.Sheets[sheetName]);
+			
+			json_object = JSON.stringify(XL_row_object); 
+			 
+			//json_object
+			List = JSON.parse(json_object);  
+			
+			var tablehead = '<tr>';
+			var tablebody = '';			 
+			
+			//var columnList = ["Answer_NO", "System", "Question", "category main", "category sub", "Answer", "Keyword", "SOP chapter", "SOP No", "URL", "Enabled", "異動"];
+			var columnList = ["Answer_NO","Question","Answer","Keyword","SOP chapter","SOP No","URL","異動"];
+			//var columnWidth = [100,70,300,130,130,600,150,120,100,250,75,60];
+			var columnWidth = [100,300,600,150,120,100,250,60];
+			 
+			for(i = 0 ; i < columnList.length ; i++){
+				tablehead += '<th style="min-width:'+columnWidth[i]+'px;">'+columnList[i]+'</th>'	
+			}
+			
+			tablehead += '</tr>' 
+			jQuery( '#tablehead' ).html( tablehead )
+			var allCount = 0;
+			var addCount = 0;
+			var updateCount = 0;
+			var deleteCount = 0;
+			//內容
+			for(i = 0 ; i < List.length ; i++){
+				Answer_NO = List[i][columnList[0]];
+				tablebody += '<tr id="'+Answer_NO+'_row">' 
+				for(j = 0 ; j < columnList.length ; j++){
+					if (List[i][columnList[j]] !== undefined){
+						tablebody += '<td style="min-width:'+columnWidth[j]+'px; ">'+List[i][columnList[j]]+'</td>';
+					}else{
+						tablebody += '<td style="min-width:'+columnWidth[j]+'px;"></td>';
+					}
+				}
+				if(List[i]["異動"] == "新增") addCount = addCount + 1;
+				if(List[i]["異動"] == "修訂") updateCount = updateCount + 1;
+				if(List[i]["異動"] == "刪除") deleteCount = deleteCount + 1;
+				allCount = allCount + 1;
+				tablebody += '</tr>'
+			}			
+			$('#allAction').html(allCount);
+			$('#addAction').html(addCount);
+			$('#updateAction').html(updateCount);
+			$('#deleteAction').html(deleteCount);
+			jQuery( '#tablebody' ).html( tablebody );
+		}
+		
+	  })
+	 };
+
+	reader.onerror = function(ex) {
+	  console.log(ex);
+	};
+
+	reader.readAsBinaryString(file);
+  };
+};
+
+function handleFileSelect(evt) {    
+	var files = evt.target.files; // FileList object
+	var xl2json = new ExcelToJSON();
+	xl2json.parseExcel(files[0]);
+}
+
+function upload(){
+
+db = $('#deptSystem').html().toLowerCase();
+console.log('PERNR:'+PERNR+' db:'+db)
+//console.log(JSON.stringify(List))
+console.log(List)
+ $.ajax({
+	url: "http://"+ajaxUrlPort+"/uploadStandandQuestion" ,
+	type: "GET",
+	data:{ db:db, PERNR:PERNR, List:JSON.stringify(List)}, 
+    dataType: "json",
+	contentType: "application/json; charset=utf-8",
+	//traditional: true,
+	success: function (data) {
+	console.log('upload result:');
+		console.log(data);
+		for(Answer_NO in data){
+			if(data[Answer_NO]['result'] == 1){
+				console.log(Answer_NO+' '+data[Answer_NO]['異動']+'成功')
+				$("#"+Answer_NO+"_row").css('background-color', '#c2f0c2');
+			}else{
+				console.log(Answer_NO+' '+data[Answer_NO]['異動']+'失敗')
+				$("#"+Answer_NO+"_row").css('background-color', '#ffd6cc');
+			}
+			
+		}
+
+	},				
+	error: function(xhr) {			  
+	  alert('[uploadStandandQuestion] 出錯了! 請聯繫 梁均銘 513-65073');
+	}
+});	
+		
+}
+ 
+</script>
+
+
+<script>
+//var ajaxUrlPort = '127.0.0.1:81'; //桌機 
+var ajaxUrlPort = '10.55.52.98:35081'; //hpc
+var currentPath = window.location.href;
+
+var ssoUrl = "http://10.55.8.136:2400/api/SSO"; //ID 136
+//var ssoUrl = "http://tnvqis03/ID/Publish/api/SSO";
+
+$(document).ready(function() { 
+	$(".tab-pane").height(screen.availHeight-158);
+	$(".tbody").height(screen.availHeight-222);
+	var query = window.location.search.substring(1);
+	var qs = parse_query_string(query);
+	//SSO 取得User資料
+	if (qs['userChineseName'] !== undefined){ 
+		userChineseName = qs['userChineseName'];
+		PERNR = qs['PERNR'];
+		console.log(userChineseName+' '+PERNR)
+		window.history.replaceState({}, document.title, window.location.pathname);		
+		$('#userChineseName').html(userChineseName);
+		getAdminAuth()
+		
+	}else{
+		window.location.href = ssoUrl+"?redirectUrl="+currentPath;
+		setTimeout(function(){console.log('SSO未取得工號');},300000);
+	}
+	
+	if (qs['app'] !== undefined){
+		app = qs['app'];
+		if(app == 'AIIBU') app = 'AII BU';
+		if(app == 'MDBU') app = 'MD BU';
+		$('#app').html(app);
+		window.history.replaceState({}, document.title, "/coq/bu.htm");
+	}else{
+		app = $("#app").html();
+	}	
+		 
+});
+var dataProvider;
+var AuthObj = '';
+var department = '';
+function getAdminAuth(){
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/getAdminAuth" ,
+		type: "GET",
+		data:{ PERNR:PERNR},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+		console.log('getAdminAuth:');
+			console.log(data);
+			department = data['department'];
+			if(department != "na"){ //白名單的帳號
+				AuthObj = JSON.parse(data['auth']);
+				console.log(AuthObj['view']);
+				db = AuthObj['view'].toLowerCase();
+				console.log('db: '+AuthObj['view']);
+				if(db != 'all') {
+					changeItem('deptSystem',db)
+					$("#deptSystem").attr('disabled', true);
+				}else{
+					changeItem('deptSystem','mq')
+				}
+				
+				setTimeout(function(){		 
+					search();
+				},100); 
+			}else{ //非白名單帳號
+				$("#deptSystem").attr('disabled', true);
+				//alert()
+				$('#userChineseName').html($('#userChineseName').html()+'<span style="color:red">(非白名單帳號，無法使用)</span>');
+			}
+		},				
+		error: function(xhr) {			  
+		  alert('[getAdminAuth] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	});
+}
+
+function changeItem(id,text){	
+	$('#'+id).html(text) 
+	search();
+}  
+
+function splitMulti(str, tokens){
+	var tempChar = tokens[0];
+	for(var i = 1; i < tokens.length; i++){
+		str = str.split(tokens[i]).join(tempChar);
+	}
+	str = str.split(tempChar);
+	return str;
+}
+
+function search(){ 
+	
+	db = $('#deptSystem').html().toLowerCase();
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/getStandandQuestion",
+		type: "GET",
+		dataType: 'json',
+		data:{db:db},
+		contentType: "application/json; charset=utf-8",
+		success: function (data) {
+			//console.log(data);
+			var tbody0 = '',tbody1 = '';
+			for(var Answer_NO in data){
+				//Answer_NO,System,Question,category_main,category_sub,Answer,Keyword,SOP_chapter,SOP_No,URL,Enabled,Creator,Create_Date
+				//console.log('Answer_NO:'+Answer_NO+' '+data[Answer_NO]['System'])			
+				Question = data[Answer_NO]['Question'];
+				Keyword = data[Answer_NO]['Keyword'];
+				tbody0 = tbody0+'<tr class="row100" style="cursor: pointer;">';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:90px;padding:.5rem;">'+Answer_NO+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:60px;padding:.5rem;">'+data[Answer_NO]['System']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:200px;padding:.5rem;">'+Question+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:140px;padding:.5rem;">'+data[Answer_NO]['category_main']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:150px;padding:.5rem;">'+data[Answer_NO]['category_sub']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:300px;padding:.5rem;">'+data[Answer_NO]['Answer']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:200px;padding:.5rem;">'+Keyword+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:100px;padding:.5rem;">'+data[Answer_NO]['SOP_chapter']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:100px;padding:.5rem;">'+data[Answer_NO]['SOP_No']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:200px;padding:.5rem;">'+data[Answer_NO]['URL']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:60px;padding:.5rem;">'+data[Answer_NO]['Enabled']+'</td>';
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:70px;padding:.5rem;">'+data[Answer_NO]['Creator']+'</td>';				
+				tbody0 = tbody0+'<td class="" style="max-width:10px;min-width:130px;padding:.5rem;">'+data[Answer_NO]['Create_Date']+'</td>';
+				tbody0 = tbody0+'</tr>';
+				
+				var KeywordList = splitMulti(Keyword, ['；', '，']); //Keyword.split(["；","，"]);
+				//Question = Question.replace('/',"xxx");
+				//console.log('['+Answer_NO+'] '+Question)
+				for(i = 0 ; i < KeywordList.length ; i++){
+					//console.log('   '+i+' '+KeywordList[i])
+					keywordTmp = KeywordList[i].toUpperCase();
+					//Question = Question.toUpperCase().replace(keywordTmp, '<span style="color:red">'+keywordTmp+'</span>');
+					Question = Question.toUpperCase().replace(keywordTmp, '{{{{{'+keywordTmp+'}}}}}');
+				}
+				
+				Question = Question.replace(/{{{{{/g,'<span style="color:red">').replace(/}}}}}/g,'</span>');
+				
+				tbody1 = tbody1+'<tr class="row100" style="cursor: pointer;" >';				 
+				tbody1 = tbody1+'<td class="" style="max-width:10px;min-width:120px;padding:.5rem;">'+Answer_NO+'</td>';
+				tbody1 = tbody1+'<td class="" style="max-width:10px;min-width:250px;padding:.5rem;">'+Question+'</td>';
+				tbody1 = tbody1+'<td class="" style="max-width:10px;min-width:300px;padding:.5rem;">'+data[Answer_NO]['Keyword']+'</td>';
+				tbody1 = tbody1+'<td class="" style="max-width:10px;min-width:550px;padding:.5rem;">'+data[Answer_NO]['Answer']+'</td>';				
+				tbody1 = tbody1+'</tr>';				 
+			}
+			
+			
+			$('#tbody0').html(tbody0);
+			$('#tbody1').html(tbody1);			
+		},				
+		error: function(xhr) {
+		  alert('getStandandQuestion 發生錯誤'); 
+		}
+	});	
+	
+	
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/getSimQuestion",
+		type: "GET",
+		dataType: 'json',
+		data:{db:db},
+		contentType: "application/json; charset=utf-8",
+		success: function (data) {
+			//console.log(data);
+			var tbody2 = '';
+			
+			for(var Answer_NO in data){
+				tbody2 = tbody2+'<tr class="row100" style="cursor: pointer;" >';
+				tbody2 = tbody2+'<td class="" style="max-width:10px;min-width:130px;padding:.5rem;">'+Answer_NO+'</td>';
+				tbody2 = tbody2+'<td class="" style="max-width:10px;min-width:780px;padding:.5rem;">'+data[Answer_NO]['Question']+'</td>';
+				tbody2 = tbody2+'<td class="" style="max-width:10px;min-width:110px;padding:.5rem;">'+data[Answer_NO]['Creator']+'</td>';
+				tbody2 = tbody2+'<td class="" style="max-width:10px;min-width:190px;padding:.5rem;">'+data[Answer_NO]['Create_Date']+'</td>';
+				tbody2 = tbody2+'</tr>';
+			}
+			$('#tbody2').html(tbody2);
+		},				
+		error: function(xhr) {
+		  alert('getSimQuestion 發生錯誤'); 
+		}
+	});		
+	
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/getJiebaSynon",
+		type: "GET",
+		dataType: 'json',
+		data:{db:db},
+		contentType: "application/json; charset=utf-8",
+		success: function (data) { 
+			var tbody3 = ''; 
+			for(var i in data){
+				no = parseInt(i)+1
+				tbody3 = tbody3+'<tr class="row100" style="cursor: pointer;" >';
+				tbody3 = tbody3+'<td class="" style="max-width:10px;min-width:70px;padding:.5rem;">'+no+'</td>';
+				tbody3 = tbody3+'<td class="" style="max-width:10px;min-width:420px;padding:.5rem;">'+data[i]['Word']+'</td>';
+				tbody3 = tbody3+'<td class="" style="max-width:10px;min-width:420px;padding:.5rem;">'+data[i]['Synonymous']+'</td>';
+				tbody3 = tbody3+'<td class="" style="max-width:10px;min-width:110px;padding:.5rem;">'+data[i]['Creator']+'</td>';
+				tbody3 = tbody3+'<td class="" style="max-width:10px;min-width:190px;padding:.5rem;">'+data[i]['Create_Date']+'</td>';
+				tbody3 = tbody3+'</tr>';
+			}
+			$('#tbody3').html(tbody3);
+		},				
+		error: function(xhr) {
+		  alert('getSimQuestion 發生錯誤'); 
+		}
+	});	
+}
+   
+</script>
+</head>
+
+  <body>
+	<div id="watermarkId2" class="watermark"></div>
+  
+  <div class="dropdown" style="margin-right:20px;position: relative;float: right;">
+	<span id="userChineseName"> </span>&nbsp;&nbsp;您好 ~	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	  <button id="deptSystem" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">mq</button>
+	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="deptSystemSelect" >
+		<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','mq')">mq</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','qs')">qs</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','qmd')">qmd</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','rma')">rma</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','sqe')">sqe</a>
+	  </div>
+	  
+  </div>
+  <!--div class="dropdown" style="margin-right:20px;position: relative;float: right;">
+	  <span id="userChineseName"> </span>&nbsp;&nbsp;您好 ~	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	  <button id="sheet" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+		標準題
+	  </button>
+	  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+		<a class="dropdown-item" href="#" onclick="changeItem('sheet','標準題')">標準題</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('sheet','相似題')">相似題</a>
+		<a class="dropdown-item" href="#" onclick="changeItem('sheet','同義詞')">同義詞</a>
+	  </div>
+	  
+  </div-->  
+  	
+  <ul class="nav nav-tabs">
+    <li class="active"><a data-toggle="tab" href="#menu0">1.標準題</a></li>  
+    <li><a data-toggle="tab" href="#menu1">2.關鍵字</a></li>
+    <li><a data-toggle="tab" href="#menu2">3.相似題</a></li>
+    <li><a data-toggle="tab" href="#menu3">4.同義詞資料庫</a></li>
+	<li><a data-toggle="tab" href="#menu4">5.上傳更新資料</a></li>
+  </ul>
+  <div class="tab-content">
+    <div id="menu0" class="tab-pane fade in active">      
+	  <div class="card mb-4" style="height:99%;margin-top:0px;margin-left:10px; border: 0px;font-size:12px; width:1250px; overflow-y:scroll;overflow-x:scroll;">
+	    <table class=" table-bordered scrolltable table-hover" style="border-collapse: collapse; font-family:Microsoft JhengHei;"> 
+		  <thead style="display:block;overflow-y: scroll;border-bottom:1px solid #eee;"> 
+		    <tr id="table_head" style="" bgcolor="#FF8C00"> 			
+			  <th scope="col" style="width:90px;padding:.5rem; ">Answer_NO</th>
+			  <th scope="col" style="width:60px;padding:.5rem; ">System</th>
+			  <th scope="col" style="width:200px;padding:.5rem;">Question</th>
+			  <th scope="col" style="width:140px;padding:.5rem;">category main</th>
+			  <th scope="col" style="width:150px;padding:.5rem;">category sub</th>
+			  <th scope="col" style="width:300px;padding:.5rem;">Answer</th>
+			  <th scope="col" style="width:200px;padding:.5rem; ">Keyword</th>
+			  <th scope="col" style="width:100px;padding:.5rem; ">SOP chapter</th>
+			  <th scope="col" style="width:100px;padding:.5rem; ">SOP No</th>
+			  <th scope="col" style="width:200px;padding:.5rem; ">URL</th>
+			  <th scope="col" style="width:60px;padding:.5rem; ">Enabled</th>
+			  <th scope="col" style="width:70px; ">Creator</th>
+			  <th scope="col" style="width:130px;">Create Date</th>
+			</tr>
+		  </thead>
+		  <tbody id="tbody0" class="tbody" style="display:block;height:480px;overflow-y:scroll;overflow-x:scroll;">				
+		  </tbody>
+		</table>			
+	  </div>	  
+    </div>
+    <div id="menu1" class="tab-pane fade">
+      <div class="card mb-4" style="height:99%;margin-top:0px;margin-left:10px; border: 0px;font-size:12px; width:1260px; overflow-y:scroll;overflow-x:scroll;">
+	    <table class=" table-bordered scrolltable table-hover" style="font-size:18px;border-collapse: collapse; font-family:Microsoft JhengHei;"> 
+		  <thead style="display:block;overflow-y: scroll;border-bottom:1px solid #eee;"> 
+		    <tr id="table_head" style="" bgcolor="#FF8C00"> 			
+			  <th scope="col" style="width:120px;padding:.5rem; ">Answer_NO</th>
+			  <th scope="col" style="width:250px;padding:.5rem;">Question</th>
+			  <th scope="col" style="width:300px;padding:.5rem; ">Keyword</th> 
+			  <th scope="col" style="width:550px;padding:.5rem;">Answer</th>			  
+			</tr>
+		  </thead>
+		  <tbody id="tbody1" class="tbody" style="display:block;height:480px;overflow-y:scroll;overflow-x:scroll;">				
+		  </tbody>
+		</table>			
+	  </div> 
+    </div>
+    <div id="menu2" class="tab-pane fade">
+      <div class="card mb-4" style="height:99%;margin-top:0px;margin-left:10px; border: 0px;font-size:12px; width:1260px; overflow-y:scroll;overflow-x:scroll;">
+	    <table class=" table-bordered scrolltable table-hover" style="font-size:18px;border-collapse: collapse; font-family:Microsoft JhengHei;"> 
+		  <thead style="display:block;overflow-y: scroll;border-bottom:1px solid #eee;"> 
+		    <tr id="table_head" style="" bgcolor="#FF8C00"> 			
+			  <th scope="col" style="width:130px;padding:.5rem; ">Answer_NO</th>
+			  <th scope="col" style="width:780px;padding:.5rem;">Question</th>
+			  <th scope="col" style="width:110px;padding:.5rem; ">Creator</th> 
+			  <th scope="col" style="width:190px;padding:.5rem;">Create_Date</th>			  
+			</tr>
+		  </thead>
+		  <tbody id="tbody2" class="tbody" style="display:block;height:480px;overflow-y:scroll;overflow-x:scroll;">				
+		  </tbody>
+		</table>			
+	  </div>  
+    </div>
+    <div id="menu3" class="tab-pane fade">
+      <div class="card mb-4" style="height:99%;margin-top:0px;margin-left:10px; border: 0px;font-size:12px; width:1260px; overflow-y:scroll;overflow-x:scroll;">
+	    <table class=" table-bordered scrolltable table-hover" style="font-size:18px;border-collapse: collapse; font-family:Microsoft JhengHei;"> 
+		  <thead style="display:block;overflow-y: scroll;border-bottom:1px solid #eee;"> 
+		    <tr id="table_head" style="" bgcolor="#FF8C00"> 			
+			  <th scope="col" style="width:70px;padding:.5rem; ">No</th>
+			  <th scope="col" style="width:420px;padding:.5rem;">Word</th>
+			  <th scope="col" style="width:420px;padding:.5rem; ">Synonymous</th>
+			  <th scope="col" style="width:110px;padding:.5rem;">Creator</th>	
+			  <th scope="col" style="width:190px;padding:.5rem;">Create_Date</th>			  
+			</tr>
+		  </thead>
+		  <tbody id="tbody3" class="tbody" style="display:block;height:480px;overflow-y:scroll;overflow-x:scroll;">				
+		  </tbody>
+		</table>			
+	  </div> 
+    </div>
+	
+	<div id="menu4" class="tab-pane fade">
+      <div class="card mb-4" style="height:99%;margin-top:0px;margin-left:10px; border: 0px;font-size:12px; width:1260px; overflow-y:scroll;overflow-x:scroll;">
+	     <form enctype="multipart/form-data">
+			<input id="upload" type=file  name="files[]">
+		</form>
+		<div class="container" id='showtable' style="display: none;margin-left:-15px;">	   
+		  總共<span id="allAction"></span>筆 &nbsp;&nbsp;&nbsp;(新增<span id="addAction"></span>筆 &nbsp;&nbsp;&nbsp;修訂<span id="updateAction"></span>筆 &nbsp;&nbsp;&nbsp;刪除<span id="deleteAction"></span>筆 )&nbsp;&nbsp;&nbsp;	
+		  <input type="button" value="上傳" onclick="upload()">
+		  <table class="table table-bordered table-sm" style="height:500px;">
+			<thead id='tablehead'>		  
+			</thead>
+			<tbody id='tablebody'>		 
+			</tbody>
+		  </table>
+		</div>
+		<!--textarea class="form-control" rows=35 cols=120 id="xlx_json"></textarea-->
+		
+		<script>
+			document.getElementById('upload').addEventListener('change', handleFileSelect, false);
+		</script>
+	  </div> 
+    </div>
+	
+  </div>
+  
+ 
+   
+	<script>
+	 
+ 
+ 
+	 
+	</script> 	
+  </body>
+
+</html>

@@ -1,0 +1,340 @@
+#wrap {
+  /* text-align:center; */
+  width: 1200px;
+  padding:10px 40px;
+  /* background-color: rgb(100, 100, 100); */
+  
+}
+body {
+  background-color: rgb(255, 255, 255);
+  /* background-color: white; */
+  width: 1120px;
+  padding:10px 80px;
+  /* background-image: url('BG6.jpg'); */
+}
+#BG_PIC {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+#System_Logo_U {
+  color:red; font-size:30px; 
+  font-family:Broadway;
+  font-weight:bold;
+  text-align:center; 
+  margin-bottom:-40px;
+  margin-top:0px;
+}
+#System_Logo_L {
+  color:red; font-size:100px;
+  font-weight:bold;
+  text-align:center; 
+  letter-spacing: -15px;
+  margin-top:0px;
+  float: left;
+  margin-right:30px;
+}
+
+#word0{
+ font-size:80px;
+ color:rgb(0, 0, 255);
+ font-family:Vineta BT;
+ text-shadow: 0 1px 0 #ccc,
+}
+
+#word1{
+ color:rgb(255, 102, 0);
+ font-family:Vineta BT;
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word2{
+ color:rgb(130,130,130);
+ font-size:80px;
+ font-family:Vineta BT;
+
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word3{
+ color:rgb(150,150,150);
+ font-size:80px;
+ font-family:Vineta BT;
+
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word4{
+ color:rgb(170,170,170);
+ font-size:80px;
+ font-family:Vineta BT;
+ 
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word5{
+ color:rgb(190,190,190);
+ font-size:80px;
+ font-family:Vineta BT;
+
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word6{
+ color:rgb(210,210,210);
+ font-size:80px;
+ font-family:Vineta BT;
+ 
+ text-shadow: 0 1px 0 #ccc,
+
+}
+#word7{
+ transform: rotate(15deg);
+ color:Green;
+ font-size:80px;
+ font-family:Vineta BT;
+ text-shadow: 0 1px 0 #ccc,
+
+}
+/* h1 { */
+  /* color: blue; */
+/* } */
+/* p { */
+  /* color: red; */
+/* } */
+/* input[type="search"]{width:48%; height:40px; color:red; font-size:150%; font-family:cursive;  */
+/* font-weight:bold;} */
+#HK_Table {
+	/* width:50%; */
+	text-align:center; 
+	font-family:Microsoft JhengHei;  
+	/* margin-left:auto;  */
+	/* margin-right:30px; */
+	/* border-collapse: collapse; */
+   	width: 900px; 	
+	word-wrap: break-word;
+   	table-layout: fixed;
+	float: left;
+	font-size: 16px;
+	font-weight:bold;
+	
+	}
+#Html_BG {
+  width: 1120px ;
+  /* height: 100px ; */
+  position: absolute;
+}
+#search_text {
+  width: 1050px ;
+  height:45px; color:blue; font-size:150%; font-family:Microsoft JhengHei;
+  font-weight:bold;
+  border-radius: 5px;
+  position: absolute;
+
+
+}
+#user_suggest {
+  width: 1120px ;
+  height:45px; color:blue; font-size:25px; font-family:Microsoft JhengHei;
+  font-weight:bold;
+  border-radius: 5px;
+}
+/* #Hot_QA { */
+  /* border:#0000ff 3px solid; */
+  /* padding: 5px 10px 10px 50px; */
+/* } */
+
+#search_answer {
+  font-size:130%;
+  font-family:Microsoft JhengHei;
+  font-weight:bold;
+  text-align:left;
+  border:#0000ff 8px double;
+  padding: 5px 20px;
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+
+}
+#history_answer {
+  background-color: rgb(255, 255, 255);
+  font-size:130%;
+  font-family:Microsoft JhengHei;
+  font-weight:bold;
+  text-align:left;
+  border:#AAAAAA 8px double;
+  padding: 5px 20px;
+  border-radius: 10px;
+}
+
+.button {
+  padding: 10px 15px;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 10%;
+  box-shadow: 0 5px #999;
+  float:right
+}
+
+.button:hover {background-color: #3e8e41}
+
+.button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 3px #666;
+  transform: translateY(4px);
+}
+
+.button2 {
+  padding: 0px 0px;
+  font-size: 12px;
+  text-align: center;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  /* background-color: #4CAF50; */
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 5px #999;
+}
+
+/* .button2:hover {background-color: #3e8e41} */
+
+.button2:active {
+  background-color: #3e8e41;
+  box-shadow: 0 3px #666;
+  transform: translateY(4px);
+}
+.astext {
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    cursor: pointer;
+	font-size:100%;
+	font-family:Microsoft JhengHei;
+	color: blue;
+}
+.astext:hover {background-color: #4CAF50}
+#Noanswer {
+    background:none;
+    border:none;
+    margin:0;
+    padding:0;
+    cursor: pointer;
+	font-size:100%;
+	font-family:Microsoft JhengHei;
+	color: red;
+}
+#Noanswer:hover {background-color: #4CAF50}
+#HotKey {
+    float: left;
+	font-size: 13px;
+	font-weight:bold;
+	margin-right:30px;
+	
+}
+label,input[type="radio"]
+{font-size:130%; cursor:pointer; font-family:Microsoft JhengHei;}
+
+.feedback li{
+	display:inline;
+	margin:2em;
+	/* text-align: left; */
+}
+/* .feedback button{ */
+	/* border-radius: 50%; */
+	/* padding: 10px 10px; */
+    /* cursor: pointer; */
+	 /* box-shadow: 5px 5px 5px #999; */
+	
+	
+/* } */
+.feedback button{
+  padding: 10px 10px;
+  cursor: pointer;
+  outline: none;
+  color: #fff;
+  /* background-color: #4CAF50; */
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 5px #999;
+}
+
+/* .button2:hover {background-color: #3e8e41} */
+
+.feedback button:active {
+  background-color: #3e8e41;
+  box-shadow: 0 3px #666;
+  transform: translateY(4px);
+}
+
+.feedback #Great{
+	background-color: #00ff00;
+	/* color: #000000; */
+	/* font-weight:bold; */
+	
+	
+}
+.feedback #OK{
+	background-color: yellow;
+	/* color: #000000; */
+	/* font-weight:bold; */
+	
+	
+}
+.feedback #Fail{
+	background-color: Red;
+	/* color: #ffffff; */
+	/* font-weight:bold; */
+	
+}
+#Stand_QA_label {
+	/* text-align: center; */
+	font-weight:bold;
+	/* padding: 10px 15px; */
+    /* outline: none; */
+    /* color: #ffffff; */
+	/* background-color: #0000ff; */
+	/* border-radius: 3%; */
+	font-family:Microsoft JhengHei;
+	padding: 10px 15px;
+    font-size: 20px;
+    text-align: center;
+    /* cursor: pointer; */
+    outline: none;
+    color: #fff;
+    background-color: #0000ff;
+    border: none;
+    border-radius: 5px;
+	margin:0 auto 0;
+	margin-bottom : -10px;
+    /* box-shadow: 0 5px #999; */
+
+}
+#History_QA_label {
+	/* text-align: center; */
+	font-weight:bold;
+	/* padding: 10px 15px; */
+    /* outline: none; */
+    /* color: #ffffff; */
+	/* background-color: #0000ff; */
+	/* border-radius: 3%; */
+	font-family:Microsoft JhengHei;
+	padding: 10px 15px;
+    font-size: 20px;
+    text-align: center;
+    /* cursor: pointer; */
+    outline: none;
+    color: #fff;
+    background-color: #888888;
+    border: none;
+    border-radius: 5px;
+	margin:0 auto 0;
+	margin-bottom : -10px;
+    /* box-shadow: 0 5px #999; */
+
+}

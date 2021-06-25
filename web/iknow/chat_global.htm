@@ -1,0 +1,1386 @@
+<!DOCTYPE html>
+<script src="js/launchChrome.js"></script>
+<script src="js/ssoRedirect.js"></script>
+<!--script src="js/ssoRedirectIKnow.js"></script-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<title>i-Know</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="img/IDD_favicon.png">
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+
+<link rel="stylesheet" href="chat.css" crossorigin="anonymous">
+
+<!--script src="../js/launchChrome_NEW.js"></script-->  
+<!--script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script-->
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.1/css/all.css" crossorigin="anonymous">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.css">
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.5/jquery.mCustomScrollbar.min.js"></script>
+
+<link rel="stylesheet" href="css/coq/qaSTDUITemplate.css">
+
+<link rel="stylesheet" href="css/lightbox.min.css"> 
+<script src="js/lightbox-plus-jquery.min.js"></script>
+
+<script src="js/coq/bootstrap.bundle.min.js"></script> 
+
+
+<script type="text/javascript">    
+//var ajaxUrlPort = '10.56.244.38:84';
+//var ajaxUrlPort = '10.55.8.201:84'; //IT01
+
+//var ajaxUrlPort = '10.55.8.137:84';  //ID137
+var ajaxUrlPort = '10.55.8.137/iknow_API';  //ID137 轉導
+
+//var iknowPath = "http://10.56.211.124:8120/I_Know"; //FPC
+var iknowPath = "http://pc89600059495s:8120/I_Know"; //HPC
+//var iknowPath = "http://10.56.244.27:4996/I_Know"; //本機
+
+//var mqPath = "http://10.56.211.124:8118" //MQ
+//var mqPath = "http://pc89600059495s:8118" //MQ
+var mqPath = "http://10.55.8.137/iknow_mq_API" //MQ 轉導
+
+//var qsPath = "http://127.0.0.1:4996" //QS local
+//var qsPath = "http://pc89600059495s:8110" //QS hpc
+//var qsPath = "http://pc89600059495s:35084" //QS hpc
+var qsPath = "http://10.55.8.137/iknow_qs_API" //QS 轉導
+
+
+//var qmdPath = "http://pc89600059495s:35085" //QMD hpc
+//var qmdPath = "http://127.0.0.1:35085" //QMD 本機
+var qmdPath = "http://10.55.8.137/iknow_qmd_API" //QMD 轉導
+
+//var rmaPath = "http://pc89600059495s:35086" //RMA hpc
+//var rmaPath = "http://127.0.0.1:34086" //RMA 本機 
+var rmaPath = "http://10.55.8.137/iknow_rma_API" //RMA 轉導
+
+//var sqePath = "http://pc89600059495s:35087" //SQE hpc
+//var sqePath = "http://127.0.0.1:34087" //SQE 本機
+var sqePath = "http://10.55.8.137/iknow_sqe_API" //SQE 轉導
+
+/************************
+# coq+ deptSystem = 1
+mq deptSystem = 2
+# m2copq deptSystem = 3
+qs deptSystem = 4
+qmd deptSystem = 5
+rma deptSystem = 6
+sqe deptSystem = 7
+************************/
+//var currentPath = window.location.href.includes("?") ? window.location.href.substring(0,window.location.href.lastIndexOf('?')) : window.location.href;
+//var currentPath = window.location.href;
+
+//var ssoUrl = "http://10.55.8.201:83/Publish/api/SSO"; //IT 01
+//var ssoUrl = "http://10.55.8.136:2400/api/SSO"; //ID 136
+//var ssoUrl = "http://tnvqis03/ID/Publish/api/SSO";
+ 
+//var PERNR = '';
+var sessionsId = 0; 
+var chatWidth = 400;
+var chatHeight = 50;
+
+var totalMessageHeight = 0;
+$( document ).ready(function() {  	
+	sessionsId = new Date().getFullYear().toString().substr(2,2)+getCurrentTime().replace(' ','').replace('-','').replace(/:/g,'');
+	/*
+	var query = window.location.search.substring(1);
+	var qs = parse_query_string(query);
+	//SSO 取得User資料
+	var helloContent = '';
+	
+	//userChineseName='梁均銘'
+	//PERNR=18017220
+	//GENDER=1
+	
+	if (qs['userChineseName'] !== undefined){ // SSO已取得工號
+		
+		userChineseName = qs['userChineseName'];
+		PERNR = qs['PERNR']; //工號
+		GENDER = qs['GENDER']; //性別
+		CSTEXT = qs['CSTEXT']; //職稱
+		
+		if(parseInt(GENDER)%2 == 1)	{
+			GENDER_ICON = 'male1';
+			if(CSTEXT.includes("處長")){ //處長層級會出現職稱，其餘用帥哥靓妹	
+				helloContent = CSTEXT;			
+			}else{
+				helloContent = '';//'帥哥';
+			}	
+			$('body').css({background : 'linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5)'});
+			$('html').css({background : 'linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5)'}); 
+			$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+		}else if(parseInt(GENDER)%2 == 0){
+			GENDER_ICON = 'female1';
+			if(CSTEXT.includes("處長")){	
+				helloContent = CSTEXT;			
+			}else{
+				helloContent = '';//'靓妹';
+			}	
+			//$('body').css({background : 'linear-gradient(to right, #F4ACF9, #F9ACE2, #F9ACB9)'});
+			//$('html').css({background : 'linear-gradient(to right, #F4ACF9, #F9ACE2, #F9ACB9)'});
+			
+			$('body').css({background : 'linear-gradient(to right, #FFB6C1, #FFB6C1, #FFB6C1)'});
+			$('html').css({background : 'linear-gradient(to right, #FFB6C1, #FFB6C1, #FFB6C1)'});
+			$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+		} 
+		console.log(userChineseName+' '+PERNR+' '+GENDER)
+		window.history.replaceState({}, document.title, window.location.pathname);
+ 		$('#userChineseName').html(userChineseName+' '+helloContent+'您好 ~ ');
+		 
+		
+		 
+	}else{ // SSO未取得工號
+		window.location.href = ssoUrl+"?redirectUrl="+currentPath;
+		//window.location.href = ssoUrl+"?redircetUrl="+currentPath;
+		
+		setTimeout(function(){console.log('SSO未取得工號');},30000);
+	}
+	*/
+	if(parseInt(GENDER)%2 == 1)	{
+		GENDER_ICON = 'male1';
+		if(CSTEXT.includes("處長")){ //處長層級會出現職稱，其餘用帥哥靓妹	
+			helloContent = CSTEXT;			
+		}else{
+			helloContent = '';//'帥哥';
+		}	
+		$('body').css({background : 'linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5)'});
+		$('html').css({background : 'linear-gradient(to right, #91EAE4, #86A8E7, #7F7FD5)'}); 
+		$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+	}else if(parseInt(GENDER)%2 == 0){
+		GENDER_ICON = 'female1';
+		if(CSTEXT.includes("處長")){	
+			helloContent = CSTEXT;			
+		}else{
+			helloContent = '';//'靓妹';
+		}	 
+		$('body').css({background : 'linear-gradient(to right, #FFB6C1, #FFB6C1, #FFB6C1)'});
+		$('html').css({background : 'linear-gradient(to right, #FFB6C1, #FFB6C1, #FFB6C1)'});
+		$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+	} 
+	console.log(userChineseName+' '+PERNR+' '+GENDER)
+	window.history.replaceState({}, document.title, window.location.pathname);
+	$('#userChineseName').html(userChineseName+' '+helloContent+'您好 ~ ');
+		
+	
+	
+	$("#card").width(document.body.offsetWidth-chatWidth-20)	
+	$("#card").height(document.body.offsetHeight-chatHeight)
+	//alert(document.body.offsetHeight)
+	$("#robotFirstTime").html(getCurrentTime());
+	
+	// 偵測Enter輸入的行為，執行submit
+	var input = document.getElementById("chat"); 
+	input.addEventListener("keyup", function(event) {
+	  if (event.keyCode === 13) {
+	   event.preventDefault();
+	   chatLog('',$("#systemId").val());
+	  }
+	});
+	var now = new Date();
+	
+    // 浮水印	
+	watermark = userChineseName+'<br>'+PERNR+'<br>'+new Date().getFullYear().toString()+'-'+getCurrentTime().replace(' ','').substr(0,5);
+	$("#watermarkId2").html(watermark);
+	
+	//changeSystem(6);
+	changeSystem(7)
+});
+
+
+
+// 主對話框隨瀏覽器大小調整
+$(window).resize(function() {
+	$("#card").width(document.body.offsetWidth - chatWidth-20);
+	$("#card").height(document.body.offsetHeight - chatHeight);
+});
+
+var $div = $('#hatList'); 
+var chatList = '';
+var messageCount = 0; //對話筆數
+var recommendList = '';
+var Chat_ID2 = '';
+ // IKnow Step1. User輸入對話
+function chatLog(chat,systemId){
+	if(chat == '') chat = $('input#chat').val();
+	console.log('chat:'+chat);
+	
+	if (PERNR != '' && chat.trim() != ''){
+		$.ajax({ 
+			url: "http://"+ajaxUrlPort+"/chatLog",	
+			type: "GET",
+			dataType: 'json',
+			data:  {PERNR:PERNR, chat:chat, sessionsId:sessionsId} ,
+			contentType: "application/json; charset=utf-8",
+			traditional: true,
+			success: function (data) { 				
+				messageCount = messageCount + 1;				
+				$("#messages").html(messageCount+' Messages') 
+				//呈現User問題
+				chatList = $("#chatList").html();
+				newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">'+chat+'<span class="msg_time_send" style="margin-left:-60px;">'+data[0]+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>'
+				$("#chatList").html(chatList+newChat)
+				//傳入大腦
+				if(systemId == 1){ //CoQ+
+					iknow(data[1],PERNR,chat); 
+				}else if(systemId == 2){ //MQ
+					console.log('systemId = 2 , MQ') 
+					I_Know_ALL(data[1],PERNR,chat);
+				}else if(systemId == 3){ //Net m2
+					console.log('systemId = 3 , Net m2 Cash In') 
+					net(data[1],PERNR,chat); 				
+				}else if(systemId == 4){ //QS
+					console.log('systemId = 4 , QS') 
+					I_Know_ALL(data[1],PERNR,chat); 
+				}else if(systemId == 5){ //QMD
+					console.log('systemId = 5 , QMD') 
+					I_Know_ALL(data[1],PERNR,chat); 
+				}else if(systemId == 6){ //RMA
+					console.log('systemId = 6 , RMA') 
+					I_Know_ALL(data[1],PERNR,chat); 
+				}else if(systemId == 7){ //SQE
+					console.log('systemId = 7 , SQE') 
+					I_Know_ALL(data[1],PERNR,chat); 
+				}				
+			},				
+			error: function(xhr) {
+			  alert('chatLog 出錯了! 請聯繫 梁均銘 513-65073');
+			}
+		}); 
+	}	
+}			
+
+// MQ Step1. User輸入對話
+function chatLog2(chat,answerNo,Chat_ID){
+	if(chat == '') chat = $('input#chat').val();
+	console.log('chat:'+chat);
+	$('[name="lead_'+Chat_ID+'"]').hide();
+	$("#lead_"+Chat_ID).html($("#lead_"+Chat_ID+'_'+answerNo).html())
+	if (PERNR != '' && chat.trim() != ''){
+		$.ajax({ 
+			url: "http://"+ajaxUrlPort+"/chatLog",	
+			type: "GET",
+			dataType: 'json',
+			data:  {PERNR:PERNR, chat:chat, sessionsId:sessionsId} ,
+			contentType: "application/json; charset=utf-8",
+			traditional: true,
+			success: function (data) {				
+				messageCount = messageCount + 1;						
+				$("#messages").html(messageCount+' Messages')
+				//傳入大腦 
+				I_Know_ALL(data[1],PERNR,chat);
+				
+				//呈現User問題	
+				chatList = $("#chatList").html();
+				newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">'+chat+'<span class="msg_time_send" style="margin-left:-60px;">'+data[0]+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>'
+				$("#chatList").html(chatList+newChat)
+			},				
+			error: function(xhr) {
+			  alert('chatLog2出錯了! 請聯繫 梁均銘 513-65073');
+			}
+		}); 
+	}	
+}
+
+// Net m2 Step2. 對話輸入到IKnow大腦，取得問題類別與參數
+function net(Chat_ID,PERNR,chat){
+	recommendList = [];
+	netImg = [];
+	// 1.AA[獲利高]又[品質佳]的客戶群有哪些? 9,10
+	if(chat.indexOf('獲利高') >= 0 && chat.indexOf('品質佳') >= 0){ 
+		answerNo = 'N001';
+		newChatContent = '1.客戶(m2 Cash In\\Net m2 Cash In USD):CONTINENTA(3,302\\3,302); BMW(2,037\\2,025); TOMTOM(1,699\\1,699); Panasonic(1,485\\1,130);APTIV(1,278\\1,278)';
+		 
+		netImg = ['copq1_1','copq1_2']; 
+		netImgTitle = ' ';
+		recommendList = ['AA 品質狀況最好客戶群有哪些?','AA 品質成本低且占比低的客戶群有哪些?'];
+	// 2.AA最[適合][接單]的客戶群有哪些? 9,10
+	}else if(chat.indexOf('適合') >= 0 && chat.indexOf('接單') >= 0 && chat.indexOf('不') < 0){ 
+		answerNo = 'N002';
+		newChatContent = '2.客戶(m2 Cash In\\Net m2 Cash In USD):CONTINENTA(3,302\\3,302);BMW(2,037\\2,025); TOMTOM(1,699\\1,699); Panasonic(1,485\\1,130);APTIV(1,278\\1,278)';
+		netImg = ['copq1_1','copq1_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA 品質狀況最好客戶群有哪些?','AA 品質成本低且占比低的客戶群有哪些?'];
+	// 3.AA[獲利低]又[品質差]的客戶群有哪些? 7,8
+	}else if(chat.indexOf('獲利低') >= 0 && chat.indexOf('品質差') >= 0){ 
+		answerNo = 'N003';
+		newChatContent = '3.客戶(m2 Cash In\\Net m2 Cash In USD):ALPINE(39\\39); TPK(530\\506); GM(609\\604);BOSCH(691\\559); Visteon(950\\923);NIPPON SEI(1,091\\1,013)';
+		netImg = ['copq1_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA品質改善重點客戶群有哪些?','AA 品質成本高且占比高的客戶群有哪些?'];
+	// 4.AA最[不]適合[接單]的客戶群有哪些? 7,8
+	}else if(chat.indexOf('接單') >= 0 && chat.indexOf('不') >= 0 && chat.indexOf('差異') < 0){ 
+		answerNo = 'N004';
+		newChatContent = '4.客戶(m2 Cash In\\Net m2 Cash In USD):ALPINE(39\\39); TPK(530\\506); GM(609\\604);BOSCH(691\\559); Visteon(950\\923);NIPPON SEI(1,091\\1,013)';
+		netImg = ['copq1_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA品質改善重點客戶群有哪些?','AA 品質成本高且占比高的客戶群有哪些?'];		
+	// 5. AA[獲利高]又[品質差]的客戶群有哪些? 7,8
+	}else if(chat.indexOf('獲利高') >= 0 && chat.indexOf('品質差') >= 0){ 
+		answerNo = 'N005';
+		newChatContent = '5.客戶(m2 Cash In\\Net m2 Cash In USD):AUDI AG(1,945\\393)';
+		netImg = ['copq1_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA AUDI的CoPQ原因的占比?','AA audi造成品質差的機種'];
+	// 6.AA 最[適合]與最不適合接單客戶群在m2 Cash In 平均[差異]有多大?	7,9
+	}else if(chat.indexOf('適合') >= 0 && chat.indexOf('差異') >= 0){ 
+		answerNo = 'N006';
+		newChatContent = '6.最高群平均-最低群平均: 926 USD (1533-607)';
+		netImg = ['copq1_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA品質改善重點客戶群有哪些?','AA 品質狀況最好客戶群有哪些?'];
+	// 7.AA[品質][改善]重點客戶群有哪些? 11,12
+	}else if(chat.indexOf('品質') >= 0 && chat.indexOf('改善') >= 0){ 
+		answerNo = 'N007';
+		newChatContent = '7.客戶(m2 CoPQ USD\\ m2CoPQ占比%):AUDI AG(1,552\\79.8%); 承洺(224\\42.3%)';
+		netImg = ['copq3_1','copq3_2'];
+		netImgTitle = '';
+		recommendList = ['AA audi 的CoPQ差的主要原因為?','AA audi 的CoPQ 最需改善原因為?'];		
+	// 8.AA 品質[成本高]且[占比高]的客戶群有哪些? 11,12
+	}else if(chat.indexOf('成本高') >= 0 && chat.indexOf('占比高') >= 0){ 
+		answerNo = 'N008';
+		newChatContent = '8.客戶(m2 CoPQ USD\\ m2CoPQ占比%):AUDI AG(1,552\\79.8%); 承洺(224\\42.3%)';
+		netImg = ['copq3_1','copq3_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA AUDI的CoPQ原因的占比?','AA audi造成品質差的機種'];
+	// 9. AA [品質]狀況最[好][客戶]群有哪些?
+	}else if(chat.indexOf('品質') >= 0 && chat.indexOf('好') >= 0 && chat.indexOf('客戶') >= 0){ 
+		answerNo = 'N009';
+		newChatContent = '9.客戶(m2 CoPQ USD\\ m2CoPQ占比%):ALPINE(0\\0.82%);  GM(5\\0.9%); Visteon(27\\2.84%);TPK(24\\4.62%);NIPPON SEI(78\\17.18%)';
+		netImg = ['copq3_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA AUDI的CoPQ原因的占比?'];
+	// 10. AA 品質[成本低]且[占比低]的客戶群有哪些?
+	}else if(chat.indexOf('成本低') >= 0 && chat.indexOf('占比低') >= 0){ 
+		answerNo = 'N010';
+		newChatContent = '10.客戶(m2 CoPQ USD\\ m2CoPQ占比%):ALPINE(0\\0.82%);  GM(5\\0.9%); Visteon(27\\2.84%);TPK(24\\4.62%);NIPPON SEI(78\\17.18%)';
+		netImg = ['copq3_2'];
+		netImgTitle = ' ';
+		recommendList = ['AA AUDI的CoPQ原因的占比?'];
+	// 11. AA [audi] 的[CoPQ][差]的主要原因為?
+	}else if(chat.toLowerCase().indexOf('audi') >= 0 && chat.toLowerCase().indexOf('copq') >= 0 && chat.indexOf('差') >= 0){ 
+		answerNo = 'N011';
+		newChatContent = '11.AUDI AG:OBA Sorting CoPQ : 1,431(92%)';
+		netImg = ['copq4'];
+		netImgTitle = ' ';		
+	// 12. AA [audi] 的[CoPQ] 最需改善原因為?
+	}else if(chat.toLowerCase().indexOf('audi') >= 0 && chat.toLowerCase().indexOf('copq') >= 0 && chat.indexOf('改善') >= 0){ 
+		answerNo = 'N012';
+		newChatContent = '12.AUDI AG:OBA Sorting CoPQ : 1,431(92%)';
+		netImg = ['copq4'];
+		netImgTitle = ' ';	
+	// 13. AA [audi] 的[CoPQ] 原因的[占比]?
+	}else if(chat.toLowerCase().indexOf('audi') >= 0 && chat.toLowerCase().indexOf('copq') >= 0 && chat.indexOf('占比') >= 0){ 
+		answerNo = 'N013';
+		newChatContent = '13. AERB CoPQ:21(1%) , FR CoPQ:0(0%) , OBA Sorting CoPQ 1431(92%) , VLRR CoPQ:99(6%)';
+		netImg = ['copq4'];
+		netImgTitle = '';	
+		recommendList = ['AA audi造成品質差的機種?']	
+	// 14. AA 客戶m2 CoPQ 差異有多大 
+	}else if(chat.indexOf('差異') >= 0 && chat.indexOf('適合') < 0){ 
+		answerNo = 'N014';
+		newChatContent = '14.AUDI AG-ALPINE=1,552 USD';	 
+		netImg = ['copq2'];
+		netImgTitle = ' ';		
+		recommendList = ['AA AUDI的CoPQ原因的占比?','AA audi造成品質差的機種'];
+		
+	// 15. AA audi造成品質差的[機種]?	
+	}else if(chat.indexOf('機種') >= 0){ 
+		answerNo = 'N015';
+		newChatContent = '15.AUDI機種(m2 CoPQ USD\\ m2CoPQ占比%):DD086IA-03A(7,010\\2,018.4%);  DD101IA-11D(9,935\\557.4%); DD1012A-14A(6,138\\195.9%)';	 
+		netImg = ['copq5'];
+		netImgTitle = ' ';		
+		recommendList = ['AA AUDI的CoPQ原因的占比?']
+	// Other 
+	}else{
+		answerNo = 'N500';
+		newChatContent = '無法回答您喔,我只能回答m2 CoPQ的問題';
+	}
+	 
+	chatList = $("#chatList").html(); 	 
+	  
+	url = 'http://10.55.8.201:6204/templates/autoiframe/m2_CoPQ_0219.html';
+	 
+	
+	// 答案的呈現
+	newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+	newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+	newChat = newChat+'<div id="chat_'+Chat_ID+'" style="" class="msg_cotainer" title="'+answerNo+'">'+ newChatContent  //decodeURIComponent(newChatContent);
+	newChat = newChat+'<br><span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span>';
+		
+	// 問題推薦(您是否想詢問以下問題)
+	if(Object.keys(recommendList).length > 0){
+		recommend1 =  recommendList[0];
+		newChat = newChat+'您是否想詢問以下問題 :<a href="#" onclick="chatLog(\''+recommend1+'\',3);"> 1. '+recommend1+'</a>&nbsp;&nbsp;';
+	}
+	if(Object.keys(recommendList).length > 1){
+		recommend2 =  recommendList[1];
+		newChat = newChat+'<a href="#" onclick="chatLog(\''+recommend2+'\',3);"> 2. '+recommend2+'</a>&nbsp;&nbsp;';
+	}
+	if(Object.keys(recommendList).length > 2){
+		recommend3 =  recommendList[2];
+		newChat = newChat+'<a href="#" onclick="chatLog(\''+recommend3+'\',3);"> 3. '+recommend3+'</a><br>';
+	}
+	
+	// 回饋手勢按鈕，讚與倒讚	
+	newChat = newChat+'<a style=" margin-left:0%;color: green;" class="fas fa-external-link-alt" href="#" onclick="window.open(\''+url+'\', \'_blank\');">m<sup>2</sup> CoPQ詳情</a><br>';				 
+	//if(netImg != ''){
+	for(i = 0 ; i < Object.keys(netImg).length ; i++){
+		newChat = newChat+'<a class="example-image-link" href="img/'+netImg[i]+'.jpg" data-lightbox="example-1" data-title="'+netImgTitle+'"><img id="img_'+Chat_ID+'_'+i+'" class="example-image" src="img/'+netImg[i]+'_sub.jpg" alt="image-1" style="margin-top:5px;"></a>&nbsp;&nbsp;';		
+		setTimeout("resetImgWH("+Chat_ID+"_"+i+")",100)
+	}
+	newChat = newChat+'</div>';			
+	newChat = newChat+'<div class="img_cont_msg"><img id="hand0_'+Chat_ID+'" src="img/hand0.png" style="margin-left:5px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',0)" title="正確解答"></div>';
+	newChat = newChat+'<div class="img_cont_msg"><img id="hand1_'+Chat_ID+'" src="img/hand1.png" style="margin-left:15px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',1)" title="答非所問"></div></div>';
+					 
+	$("#chatList").html(chatList+newChat);
+ 
+	// 依性別替換robot icon
+	if(GENDER == 1)	{
+		$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+	}else {
+		$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+	}
+	
+	totalMessageHeight = totalMessageHeight+600; 
+	$("#chatBody").animate({
+		scrollTop: totalMessageHeight				
+	}, 3000);
+}
+
+// IKnow Step2. 對話輸入到IKnow大腦，取得問題類別與參數
+function iknow(Chat_ID,PERNR,chat){
+	var iknowJSON = {
+		"Chat_ID":Chat_ID,
+		"user_ID":PERNR,
+		"user_question": chat,
+		"application": "",
+		"year": "",
+		"month":"",
+		"ou":"",
+		"fab":"",
+		"customer":""
+		};
+	console.log('iknowJSON:');	
+	console.log(iknowJSON);
+	
+	$.ajax({
+		url: iknowPath,
+		type: "POST",
+		dataType: 'json',
+		data:  JSON.stringify(iknowJSON) ,
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			console.log('iknow data:')
+			console.log(data)
+			if (data.category_main == 'AIOK'){ // AIOK類，直接回答URL
+				chatList = $("#chatList").html();
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+				newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+				newChat = newChat+'<div id=" " style="" class="msg_cotainer" >'+data['data'][0]['answer']+' <a href="'+data['data'][0]['URL']+'" target="_blank">'+data['data'][0]['URL']+'</a>';	
+				 
+				newChat = newChat+'<span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span></div>';
+				$("#chatList").html(chatList+newChat);				
+				
+				// 依性別替換robot icon
+				if(GENDER == 1)	{
+					$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+				}else {
+					$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+				}
+				 
+				messageHeight = messageCount * 300; 
+				$("#chatBody").animate({
+					scrollTop: messageHeight				
+				}, 3000);
+			
+ 			}else if (data.answerType == 'lead'){ // lead類
+				chatList = $("#chatList").html(); 
+				newChatContent = '';
+				app = data['application'];
+				yearmonth = data['year']+data['month'];
+				lead1 = data['data'][0]['answerNo'];
+				
+				// 呈現lead 選項
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer" title="">你想詢問以下哪個問題?<span class="msg_time" id="robotFirstTime" style="margin-left:2px;margin-top:30px;">'+getCurrentTime()+'</span></div><div id="lead_'+Chat_ID+'" class="msg_cotainer" title="">請點選下列項目</div></div>';				
+				newChat = newChat+'<div class="d-flex justify-content-start mb-4">';				
+				newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead1+'" style="cursor: pointer;" class="msg_cotainer" onclick="getAnswer(\''+app+'\',\''+yearmonth+'\',\''+lead1+'\',\''+Chat_ID+'\')" title="'+lead1+'">1. '+data['data'][0]['question']+'</div>';	
+				if( Object.keys(data['data']).length >1) {
+					lead2 = data['data'][1]['answerNo'];
+					newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead2+'" style="cursor: pointer;" class="msg_cotainer" onclick="getAnswer(\''+app+'\',\''+yearmonth+'\',\''+lead2+'\',\''+Chat_ID+'\')" title="'+lead2+'">2. '+data['data'][1]['question']+'</div>';
+				}else{
+					lead2 = '';
+				}
+				
+				if( Object.keys(data['data']).length >2) {
+					lead3 = data['data'][2]['answerNo'];
+					newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead3+'" style="cursor: pointer;" class="msg_cotainer" onclick="getAnswer(\''+app+'\',\''+yearmonth+'\',\''+lead3+'\',\''+Chat_ID+'\')" title="'+lead3+'">3. '+data['data'][2]['question']+'</div>';
+				}else{
+					lead3 = '';
+				}
+				newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_fail" style="cursor: pointer;" class="msg_cotainer" onclick="getAnswer(\''+app+'\',\''+yearmonth+'\',\'fail\',\''+Chat_ID+'\')" title="以上皆非">  以上皆非</div></div>';		
+				leadUpdate(app,yearmonth,lead1,lead2,lead3,Chat_ID);								
+				
+				$("#chatList").html(chatList+newChat);
+				// 依性別替換robot icon
+				if(GENDER == 1)	{
+					$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+				}else {
+					$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+				}
+				
+				// scroll bar往下移
+				messageHeight = messageCount * 300; 
+				$("#chatBody").animate({
+					scrollTop: messageHeight				
+				}, 3000);
+				
+			}else if (data.answerType == "standard"){ // 常態性回答				
+				app = data['application'];
+				yearmonth = data['year']+''+data['month'];
+				answerNo = data['data'][0]['answerNo'];
+				
+				if(yearmonth>201912) yearmonth=201912;
+				
+				console.log(app+' '+yearmonth+' '+answerNo)
+				getAnswer(app,yearmonth,answerNo,Chat_ID);	// 取得答案
+				recommendList = '';
+				if (typeof(data['suggest']) != 'undefined') {					
+					recommendList = data['suggest'];
+				}
+			}else if (data.answerType == "No_Answer"){ // 問題超出範圍
+				chatList = $("#chatList").html();
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+				newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+				newChat = newChat+'<div id=" " style="" class="msg_cotainer" >'+data['data'][0]['answer'];	
+				 
+				newChat = newChat+'<span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span></div>';
+				$("#chatList").html(chatList+newChat);				
+				// 依性別替換robot icon
+				if(GENDER == 1)	{
+					$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+				}else {
+					$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+				}
+				// scroll bar往下移 
+				messageHeight = messageCount * 80; 
+				$("#chatBody").animate({
+					scrollTop: messageHeight				
+				}, 3000);
+			}
+		},				
+		error: function(xhr) {
+		  alert('[iknow大腦] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	});	
+}
+
+// IKnow Step2.1 輸入問題類別與參數到CoQ+，呈現問題的答案。
+function getAnswer(app,yearmonth,answerNo,Chat_ID){
+	$('[name="lead_'+Chat_ID+'"]').hide();
+	$("#lead_"+Chat_ID).html($("#lead_"+Chat_ID+'_'+answerNo).html())
+	
+	// 20200205 臨時配合201900 這類全年需求修改。
+	if(answerNo != 'Q048' && answerNo != 'Q049' && yearmonth%100 == 0){
+		yearmonth = yearmonth/100+'12'
+		console.log('getAnswer yearmonth:'+yearmonth)
+	}
+	if(answerNo == 'fail'){
+		feedback(Chat_ID,1);
+	}else{
+		$.ajax({
+			//url: "http://"+ajaxUrlPort+"/"+answerNo,
+			url: "http://"+ajaxUrlPort+"/getAnswer",
+			type: "GET",
+			data:{ app:app , yearmonth:yearmonth , Chat_ID:Chat_ID , answerNo:answerNo},
+			//data:{ app:app , yearmonth:yearmonth , Chat_ID:Chat_ID},
+			dataType: 'json',
+			contentType: "application/json; charset=utf-8",
+			traditional: true,
+			success: function (data) {
+				console.log('getAnswer:');
+				console.log(data); 
+				chatList = $("#chatList").html(); 
+				
+				newChatContent = '';
+				 
+				Object.keys(data).forEach(function(key) { 
+				  newChatContent = newChatContent+key+' : '+data[key]+'<br>'
+				})
+				url = 'http://10.56.211.124:31080/coq/bu.htm';
+				if(app != '所有應用' && app != ''){				
+					url = 'http://10.56.211.124:31080/coq/bu.htm?app='+app;
+				}
+				
+				// 答案的呈現
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+				newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+				newChat = newChat+'<div id="chat_'+Chat_ID+'" style="" class="msg_cotainer" title="'+answerNo+'">'+newChatContent;			
+				newChat = newChat+'<span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span>';
+				
+				// 問題推薦(您是否想詢問以下問題)
+				if(Object.keys(recommendList).length > 0){
+					recommend1 =  recommendList[0]['year']+recommendList[0]['month']+' '+recommendList[0]['application']+' '+recommendList[0]['question']['Question']
+					newChat = newChat+'<br> 您是否想詢問以下問題 :<br><a href="#" onclick="chatLog(\''+recommend1+'\',1);"> 1. '+recommend1+'</a><br> ';
+				}
+				if(Object.keys(recommendList).length > 1){
+					recommend2 =  recommendList[1]['year']+recommendList[1]['month']+' '+recommendList[1]['application']+' '+recommendList[1]['question']['Question']
+					newChat = newChat+'<a href="#" onclick="chatLog(\''+recommend2+'\',1);"> 2. '+recommend2+'</a><br> ';
+				}
+				if(Object.keys(recommendList).length > 2){
+					recommend3 =  recommendList[2]['year']+recommendList[2]['month']+' '+recommendList[2]['application']+' '+recommendList[2]['question']['Question']
+					newChat = newChat+'<a href="#" onclick="chatLog(\''+recommend3+'\',1);"> 3. '+recommend3+'</a><br> ';
+				}
+				
+				// 回饋手勢按鈕，讚與倒讚	
+				newChat = newChat+'<a style=" margin-left:0%;color: green;" class="fas fa-external-link-alt" href="#" onclick="window.open(\''+url+'\', \'_blank\');">'+app+' CoQ詳情</a><br>'+				 
+				'<a class="example-image-link" href="../img/coqLightboxTmp.jpg" data-lightbox="example-1" data-title="'+yearmonth+' '+app+'"><img id="img_'+Chat_ID+'" class="example-image" src="../img/coqLightboxTmp.jpg" alt="image-1"></a></div>';			
+				newChat = newChat+'<div class="img_cont_msg"><img id="hand0_'+Chat_ID+'" src="img/hand0.png" style="margin-left:5px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',0)" title="正確解答"></div>';
+				newChat = newChat+'<div class="img_cont_msg"><img id="hand1_'+Chat_ID+'" src="img/hand1.png" style="margin-left:15px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',1)" title="答非所問"></div></div>';
+								 
+				$("#chatList").html(chatList+newChat);				 
+				
+				var img = document.getElementById('img_'+Chat_ID); 
+				//or however you get a handle to the IMG
+				var width = img.clientWidth;
+				var height = img.clientHeight;
+				//alert(width+' '+height)
+				//setTimeout("alert(document.getElementById('img_"+Chat_ID+"').width)",1000)
+				setTimeout("resetImgWH("+Chat_ID+")",50)
+				 
+				// 依性別替換robot icon
+				if(GENDER == 1)	{
+					$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+				}else {
+					$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+				}
+				// scroll bar往下移 
+				 
+				$("#chat_"+Chat_ID).height()
+				//messageHeight = messageCount * 300; 
+				totalMessageHeight = totalMessageHeight+$("#chat_"+Chat_ID).height()-20;
+				
+				//alert(Chat_ID+' totalMessageHeight:'+totalMessageHeight)
+				$("#chatBody").animate({
+					scrollTop: totalMessageHeight				
+				}, 3000);
+			},				
+			error: function(xhr) {			  
+			  alert('[getAnswer] 出錯了! 請聯繫 梁均銘 513-65073');
+			}
+		});
+	}	
+}
+
+function resetImgWH(Chat_ID){
+	width = $("#img_"+Chat_ID).width();
+	height = $("#img_"+Chat_ID).height();
+	card_width = $("#card").width();
+	//alert(width+' '+height+' card_width:'+card_width);
+	imgPercent = 0.38
+	if (width > card_width*imgPercent){
+		height = height*(card_width*imgPercent/width) 
+		width = card_width*imgPercent;		
+		$("#img_"+Chat_ID).width(width);
+		$("#img_"+Chat_ID).height(height);
+	}	
+}
+
+// MQ Step2. 對話輸入到大腦，取得問題類別與參數，呈現問題的答案。
+function I_Know_ALL(Chat_ID,PERNR,chat){
+	Chat_ID2 = PERNR +'-'+ getCurrentTime2().replace('-','').replace('-','').replace('-','').replace(/:/g,'');
+	systemId = $("#systemId").val();
+	var questionJSON = {
+		"Chat_ID":Chat_ID2,
+		"Session_ID":sessionsId,
+		"user_ID":PERNR,
+		"user_name":userChineseName,
+		"user_question": chat
+		};
+	console.log('questionJSON:');	
+	console.log(questionJSON);
+	 
+	switch (systemId) {
+	  case '2': //mq
+		url = mqPath+'/I_Know_MQ'  
+		break;
+	  case '4': //qs
+		url = qsPath+'/I_Know_QS'  
+	    break;
+	  case '5': //qmd
+	    url = qmdPath+'/I_Know_QMD'  
+		break;
+	  case '6': //rma
+	    url = rmaPath+'/I_Know_RMA'  
+		break;	
+	  case '7': //sqe
+	    url = sqePath+'/I_Know_SQE'  
+		break;		
+	  default:
+		console.log(`Sorry, we are out of ${expr}.`);
+	}	
+	console.log('url:'+url)
+	$.ajax({
+		url: url,
+		type: "POST",
+		dataType: 'json',
+		data:  JSON.stringify(questionJSON) ,
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			console.log('I_Know_ALL data:');
+			console.log(data);
+			newChatContent = data['data'][0]['answer'];
+			answerNo = data['data'][0]['answerNo'];
+			chatList = $("#chatList").html(); 
+			if (data.answerType == 'lead'){ // lead類
+				lead1 = data['data'][0]['answerNo'];
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg"><img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div><div class="msg_cotainer" title="">你想詢問以下哪個問題?<span class="msg_time" id="robotFirstTime" style="margin-left:2px;margin-top:30px;">'+getCurrentTime()+'</span></div><div id="lead_'+Chat_ID+'" class="msg_cotainer" title="">請點選下列項目</div></div>';				
+				newChat = newChat+'<div class="d-flex justify-content-start mb-4">';				
+				newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead1+'" style="cursor: pointer;" class="msg_cotainer" onclick="chatLog2(\''+data['data'][0]['question']+'\',\''+lead1+'\','+Chat_ID+')" title="'+lead1+'">1. '+data['data'][0]['question']+'</div>';	
+				if( Object.keys(data['data']).length >1) {
+					lead2 = data['data'][1]['answerNo'];
+					newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead2+'" style="cursor: pointer;" class="msg_cotainer" onclick="chatLog2(\''+data['data'][1]['question']+'\',\''+lead2+'\','+Chat_ID+')">2. '+data['data'][1]['question']+'</div>';
+				}else{
+					lead2 = '';
+				}
+				
+				if( Object.keys(data['data']).length >2) {
+					lead3 = data['data'][2]['answerNo'];
+					newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_'+lead3+'" style="cursor: pointer;" class="msg_cotainer" onclick="chatLog2(\''+data['data'][2]['question']+'\',\''+lead3+'\','+Chat_ID+')" title="'+lead3+'">3. '+data['data'][2]['question']+'</div>';
+				}else{
+					lead3 = '';
+				}
+				newChat = newChat+'<div name="lead_'+Chat_ID+'" id="lead_'+Chat_ID+'_fail" style="cursor: pointer;" class="msg_cotainer" onclick="feedback(\''+Chat_ID+'\',3)" title="以上皆非">  以上皆非</div></div>';		
+									
+			}else if (data.answerType == "standard"){ // 常態性回答	
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+				newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+				newChat = newChat+'<div id="chat_'+Chat_ID+'" style="" class="msg_cotainer" title="'+answerNo+'">'+newChatContent;	
+				
+				if(data['data'][0]['SOPNO'] != ''){
+					newChat = newChat+'<br>SOP:'+data['data'][0]['SOPNO'];
+					if(data['data'][0]['SOP'] != ''){
+						newChat = newChat+' 章節'+data['data'][0]['SOP'];
+					}
+				}else if(data['data'][0]['SOP'] != ''){
+					newChat = newChat+'<br>SOP:'+data['data'][0]['SOP'];
+				}
+				if(data['data'][0]['URL'] != ''){
+					newChat = newChat+'<br><a style=" margin-left:0%;color: green;" class="fas fa-external-link-alt" href="#" onclick="window.open(\''+data['data'][0]['URL']+'\', \'_blank\');">網路連結</a>'
+				}
+				newChat = newChat+'<span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span></div>';
+				newChat = newChat+'<div class="img_cont_msg"><img id="hand0_'+Chat_ID+'" src="img/hand0.png" style="margin-left:5px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',1)" title="正確解答"></div>';
+				newChat = newChat+'<div class="img_cont_msg"><img id="hand1_'+Chat_ID+'" src="img/hand1.png" style="margin-left:15px;cursor: pointer;" class="rounded-circle user_img_msg" onclick="feedback(\''+Chat_ID+'\',0)" title="答非所問"></div></div>'; 
+			}else if (data.answerType == "No_Answer"){ // 問題超出範圍
+				chatList = $("#chatList").html();
+				newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+				newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+				newChat = newChat+'<div id=" " style="" class="msg_cotainer" >'+data['data'][0]['answer'];					 
+				newChat = newChat+'<span class="msg_time" id="robotFirstTime" style="margin-left:2px;">'+getCurrentTime()+' </span></div>';				 
+			}
+			$("#chatList").html(chatList+newChat);
+			// 依性別替換robot icon
+			if(GENDER == 1)	{
+				$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+			}else {
+				$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+			}
+			// scroll bar往下移
+			messageHeight = messageCount * 300; 
+			$("#chatBody").animate({
+				scrollTop: messageHeight				
+			}, 3000);
+		},				
+		error: function(xhr) {
+		  alert('[I_Know_ALL大腦] 出錯了! 請聯繫 梁均銘 513-65073'); 
+		}
+	});	
+}
+ 
+// Step3. User針對答案的回饋
+function feedback(Chat_ID,result){ 
+	$("#hand0_"+Chat_ID).hide();
+	$("#hand1_"+Chat_ID).hide();
+	systemId = $("#systemId").val(); 
+	comment = '';
+	if(systemId == 1 || systemId == 3){
+		
+		if(result == 0)	{ //IKnow:正確答案
+			$("#chat_"+Chat_ID).css({"border-color":"#32CD32","border-width":"3px","border-style":"solid","padding":"5px"});
+		}else{ //IKnow:答非所問
+			$("#chat_"+Chat_ID).css({"border-color":"#DC143C","border-width":"3px","border-style":"solid","padding":"5px"});
+			comment = feedbackTextInput();
+		}
+		
+		$.ajax({
+			url: "http://"+ajaxUrlPort+"/feedback",
+			type: "GET",
+			data:{Chat_ID:Chat_ID,result:result,comment:comment},
+			dataType: 'json',
+			contentType: "application/json; charset=utf-8",
+			traditional: true,
+			success: function (data) { 
+				console.log(data);
+			},				
+			error: function(xhr) {
+			  alert('[feedback]出錯了! 請聯繫 梁均銘 513-65073');
+			}
+		});	
+		
+	}else{ //I_Know_ALL	 
+		if(result == 1)	{ //行慶:正確答案
+			$("#chat_"+Chat_ID).css({"border-color":"#32CD32","border-width":"3px","border-style":"solid","padding":"5px"});
+		}else{ //行慶:答非所問
+			$("#chat_"+Chat_ID).css({"border-color":"#DC143C","border-width":"3px","border-style":"solid","padding":"5px"});
+			comment = feedbackTextInput();
+		}
+		if(result == 3){
+			$('[name="lead_'+Chat_ID+'"]').hide();
+			$("#lead_"+Chat_ID).html($("#lead_"+Chat_ID+'_fail').html())
+		}
+		
+		switch (systemId) {
+		  case '2': //mq
+			url = mqPath+'/I_Know_MQ_FB'  
+			break;
+		  case '4': //qs
+			url = qsPath+'/I_Know_QS_FB'  
+			break;
+		  case '5': //qmd
+			url = qmdPath+'/I_Know_QMD_FB'  
+			break;
+		  case '6': //rma
+			url = rmaPath+'/I_Know_RMA_FB'  
+			break;	
+		  case '7': //sqe
+			url = sqePath+'/I_Know_SQE_FB'  
+			break;		
+		  default:
+			console.log(`Sorry, we are out of ${expr}.`);
+		}	
+		
+		$.ajax({
+			url: url,
+			type: "POST",
+			data:JSON.stringify({"Chat_ID":Chat_ID2,"feedback":result,"user_suggest":comment}), 
+			success: function (data) { 
+				console.log('I_Know_MQ_FB: Chat_ID');
+				console.log(Chat_ID);
+			},				
+			error: function(xhr) {
+			  alert('[I_Know_MQ_FB] 出錯了! 請聯繫 梁均銘 513-65073');
+			}
+		});	 
+	}
+}
+// Step3.1 回饋的修正建議
+function feedbackTextInput() {
+  var txt;
+  var comment = prompt("針對此問題的回答，請輸入您的建議，以利後續校正，謝謝 : ", "");
+  if (comment == null || comment == "") {
+    return '';
+  } else {
+    return comment;
+  }
+}
+
+// IKnow Step4. 紀錄User所選的lead結果 
+function leadUpdate(app,yearmonth,lead1,lead2,lead3,Chat_ID){
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/leadUpdate",
+		type: "GET",
+		data:{app:app,yearmonth:yearmonth,lead1:lead1,lead2:lead2,lead3:lead3,Chat_ID:Chat_ID},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) { 
+			console.log(data);
+		},				
+		error: function(xhr) {
+		  alert('[leadUpdate] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	});	
+}
+
+// 右邊取得各類Top5清單
+function changeTopList(){
+
+	deptSystem = $('#deptSystem').html()
+	systemId = $("#systemId").val();
+	//alert('systemId:'+systemId)
+	for(var j=1; j<=4; j++){ 
+		$('#button'+j).html(deptSystem)
+		$("#cardbody"+j).html('')
+		listClose(j);		 
+	}
+	listOpen(1);
+	
+	if(systemId == 3){ 
+		toplist = '<ul class="contacts">'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:0px;font-size:15px;" onclick="chatLog(\'AA獲利高又品質佳的客戶群有哪些\',3);" alt=""> 1. AA獲利高又品質佳的客戶群有哪些?<p>103次，16%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:0px;font-size:14px;" onclick="chatLog(\'AA獲利高又品質差的客戶群有哪些\',3);" alt=""> 2. AA獲利高又品質差的客戶群有哪些?<p>90次，12.5%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:0px;font-size:14px;" onclick="chatLog(\'AA品質成本高且占比高的客戶群有哪些\',3);" alt=""> 3. AA品質成本高且占比高的客戶群有哪些?<p>77次，9%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:0px;font-size:15px;" onclick="chatLog(\'AA audi的CoPQ 原因的占比\',3);" alt=""> 4. AA audi的CoPQ 原因的占比?<p>60次，7%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:0px;font-size:15px;" onclick="chatLog(\'AA audi造成品質差的機種\',3);" alt=""> 5. AA audi造成品質差的機種?<p>43次，5%</p></div></div></li>'
+		+'</ul>';
+		$("#cardbody1").html(toplist); 
+		
+		toplist = '<ul class="contacts">'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px;font-size:10px;" onclick="chatLog(\'AA 最適合與最不適合接單客戶群在m2 Cash In 平均差異有多大\',3);" alt=""> 6. AA 最適合與最不適合接單客戶群在m2 Cash In 平均差異有多大?<p>103次，16%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA品質改善重點客戶群有哪些\',3);" alt=""> 7. AA品質改善重點客戶群有哪些?<p>90次，12.5%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA 品質成本高且占比高的客戶群有哪些\',3);" alt=""> 8. AA 品質成本高且占比高的客戶群有哪些?<p>77次，9%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA 品質狀況最好客戶群有哪些\',3);" alt=""> 9. AA 品質狀況最好客戶群有哪些?<p>60次，7%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px;font-size:15px;" onclick="chatLog(\'AA 品質成本低且占比低的客戶群有哪些\',3);" alt=""> 10. AA 品質成本低且占比低的客戶群有哪些?<p>43次，5%</p></div></div></li>'
+		+'</ul>';
+		$("#cardbody2").html(toplist);
+		
+		toplist = '<ul class="contacts">'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA audi 的CoPQ差的主要原因為\',3);" alt=""> 11. AA audi 的CoPQ差的主要原因為?<p>103次，16%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA audi 的CoPQ最需改善原因為\',3);" alt=""> 12. AA audi 的CoPQ最需改善原因為?<p>90次，12.5%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA audi的CoPQ原因的占比\',3);" alt=""> 13. AA audi的CoPQ原因的占比?<p>77次，9%</p></div></div></li>'
+		+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px; " onclick="chatLog(\'AA 客戶m2 CoPQ差異有多大\',3);" alt=""> 14. AA 客戶m2 CoPQ差異有多大?<p>60次，7%</p></div></div></li>'
+		//+'<li><div class="question_list"><div class="user_info" style="margin-left:-3px;font-size:15px;" onclick="chatLog(\' \',3);" alt="">  <p>43次，5%</p></div></div></li>'
+		+'</ul>';
+		$("#cardbody3").html(toplist);
+		
+		
+		return; 
+    }	
+	//alert('systemId ˇˇˇ333:'+systemId)
+	
+	if(deptSystem == 'RQM') deptSystem = 'RMA';
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/toplist1",
+		type: "GET",
+		data:{PERNR:PERNR,deptSystem:deptSystem},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			console.log('toplist1:');
+			console.log(data)
+			if(Object.keys(data).length > 0){
+				toplist = '<ul class="contacts">';
+				for(i = 0 ; i < Object.keys(data).length ; i++){
+					tmp = data[i].split("::");
+					toplist = toplist+'<li><div class="question_list"><div class="user_info" onclick="chatLog(\''+tmp[1]+'\','+systemId+');" alt="'+tmp[0]+'"> '+(i+1)+'. '+tmp[1]+' <p>'+tmp[2]+'次，'+tmp[3]+'%</p></div></div></li>';
+				}
+				toplist = toplist+'</ul>';
+				$("#cardbody1").html(toplist); 
+			}	
+		},
+		error: function(xhr) {
+		  alert('[toplist1] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	}); 
+	
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/toplist2",
+		type: "GET",
+		data:{PERNR:PERNR,deptSystem:deptSystem},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			console.log('toplist2:');
+			console.log(data)
+			for(i = 0 ; i < Object.keys(data).length ; i++){
+				console.log(data[i])
+				if(Object.keys(data).length > 0){
+					toplist = '<ul class="contacts">';
+					for(i = 0 ; i < Object.keys(data).length ; i++){
+						tmp = data[i].split("::");
+						toplist = toplist+'<li><div class="question_list"><div class="user_info" onclick="chatLog(\''+tmp[1]+'\','+systemId+');" alt="'+tmp[0]+'"> '+(i+1)+'. '+tmp[1]+' <p>'+tmp[2]+'次，'+tmp[3]+'%</p></div></div></li>';
+					}
+					toplist = toplist+'</ul>';
+					//alert(toplist)
+					$("#cardbody2").html(toplist); 
+				}	
+			}
+		},
+		error: function(xhr) {
+		  alert('[toplist2] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	});
+	 
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/toplist3",
+		type: "GET",
+		data:{deptSystem:deptSystem},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			for(i = 0 ; i < Object.keys(data).length ; i++){
+			    console.log('toplist3:'); 
+				console.log(data)
+				if(Object.keys(data).length > 0){
+					toplist = '<ul class="contacts">';
+					for(i = 0 ; i < Object.keys(data).length ; i++){
+						tmp = data[i].split("::");
+						toplist = toplist+'<li><div class="question_list"><div class="user_info" onclick="chatLog(\''+tmp[1]+'\','+systemId+');" alt="'+tmp[0]+'"> '+(i+1)+'. '+tmp[1]+' <p>'+tmp[2]+'次，'+tmp[3]+'%</p></div></div></li>';
+					}
+					toplist = toplist+'</ul>';
+					$("#cardbody3").html(toplist); 
+				}	
+			}
+		},
+		error: function(xhr) {
+		  alert('[toplist3] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	});
+	
+	$.ajax({
+		url: "http://"+ajaxUrlPort+"/toplist4",
+		type: "GET",
+		data:{deptSystem:deptSystem},
+		dataType: 'json',
+		contentType: "application/json; charset=utf-8",
+		traditional: true,
+		success: function (data) {
+			for(i = 0 ; i < Object.keys(data).length ; i++){
+			    console.log('toplist4:'); 
+				console.log(data)
+				if(Object.keys(data).length > 0){
+					toplist = '<ul class="contacts">';
+					for(i = 0 ; i < Object.keys(data).length ; i++){
+						tmp = data[i].split("::");
+						toplist = toplist+'<li><div class="question_list"><div class="user_info" onclick="chatLog(\''+tmp[1]+'\','+systemId+');" alt="'+tmp[0]+'"> '+(i+1)+'. '+tmp[1]+' <p>'+tmp[2]+'次，'+tmp[3]+'%</p></div></div></li>';
+					}
+					toplist = toplist+'</ul>';
+					$("#cardbody4").html(toplist); 
+				}	
+			}
+		},
+		error: function(xhr) {
+		  alert('[toplist4] 出錯了! 請聯繫 梁均銘 513-65073');
+		}
+	}); 
+	 	
+}
+
+// 切換CoQ+與MQ與m2CoPQ
+function changeSystem(id){ 
+	$("#systemId").val(id);
+	 changeTopList();
+	 
+	
+	
+	//alert($('#deptSystem').html())
+	$('#chat').attr("placeholder", "請輸入"+$('#deptSystem').html()+"相關問題");
+}
+</script>
+</head> 
+	<!--Coded With Love By Mutiullah Samim-->
+	<body>
+	 <div id="watermarkId2" class="watermark"></div>
+		<input value="1" id="systemId" type="hidden"/>
+		<div class="container-fluid h-100" style='font-family:Comic Sans MS,Microsoft JhengHei;'>
+			<div class="row justify-content-center h-100">
+				
+				<div class="chat" style="margin-top: 26px;">				
+					<div class="card" id="card">
+						<div class="card-header msg_head" style="padding:0 0">
+							<div class="d-flex bd-highlight" style="height:80px;">
+								<div class="img_cont">
+								</div>
+								<div class="user_info">
+									<span style="text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9,0 3px 0 #bbb,0 4px 0 #b9b9b9,0 5px 0 #aaa,0 6px 1px rgba(0,0,0,.1),0 0 5px rgba(0,0,0,.1),0 1px 3px rgba(0,0,0,.3),0 3px 5px rgba(0,0,0,.2),0 5px 10px rgba(0,0,0,.25),0 10px 10px rgba(0,0,0,.2),0 20px 20px rgba(0,0,0,.15); font-size: 40px;font-weight:bold;color:#FFFF00">
+									 i-Know</span><span style="font-size: 14px;font-weight:;color:#A9A9A9">@ID智能推進處</span>&nbsp;&nbsp;<span>Hi~ </span><span id="userChineseName"></span>
+									<p id="messages">0 Messages</p>
+								</div>
+								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+								 
+								<div class="dropdown" style="margin-top:20px;margin-right:20px;position:relative;float:right;">
+								  <button id="deptSystem" class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">SQE</button>
+								  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+								    <a class="dropdown-item" href="#" onclick="changeItem('deptSystem','QS');changeSystem(4)"><font style="color:DeepSkyBlue;font-weight:bold;">QS</font></a>
+									<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','m2CoPQ');changeSystem(3)"><font style="color:DeepSkyBlue;font-weight:bold;">m2CoPQ</font></a>
+									<!--a class="dropdown-item" href="#" onclick="changeItem('deptSystem','CoQ+');changeSystem(1)"><font style="color:DeepSkyBlue;font-weight:bold;">CoQ+</font></a-->
+									<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','MQ');changeSystem(2)"><font style="color:DeepSkyBlue;font-weight:bold;">MQ</font></a>									
+									<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','QMD');changeSystem(5)"><font style="color:DeepSkyBlue;font-weight:bold;">QMD</font></a>
+									
+									<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','RQM');changeSystem(6)"><font style="color:DeepSkyBlue;font-weight:bold;">RQM</font></a>
+									
+									<a class="dropdown-item" href="#" onclick="changeItem('deptSystem','SQE');changeSystem(7)"><font style="color:DeepSkyBlue;font-weight:bold;">SQE</font></a>
+									
+									<!--a class="dropdown-item" href="#" onclick="changeItem('deptSystem','SQE');changeSystem(7)"><font style="color:DeepSkyBlue;font-weight:bold;">SQE</font></a-->
+								  </div>
+							    </div>
+								
+							</div>
+							<span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
+							<div class="action_menu">
+								<ul> 
+									<li style=" " id="coqSubscribe" onclick="subscribe('coqSubscribe')"><i class="fas fa-plus" ></i> CoQ 訂閱</li>
+									<!--li><i class="fas fa-user-circle"></i> Subscribe</li>
+									<li><i class="fas fa-users"></i> Add to close friends</li>
+									<li><i class="fas fa-plus"></i> Add to group</li>
+									<li><i class="fas fa-ban"></i> Block</li-->
+								</ul>
+							</div>
+						</div>
+						<div class="card-body msg_card_body " id="chatBody">
+							<div class="d-flex justify-content-start mb-4">
+								<div class="img_cont_msg">
+									<img name="robot" src="img/forMale2.jpg" class="rounded-circle user_img_msg">
+								</div>
+								<div class="msg_cotainer">
+									<span id="robotFirstTalk">請問能為您做什麼 ?</span>
+									<span class="msg_time" id="robotFirstTime" style="margin-left:2px;margin-top:30px;">8:40 AM, Today</span>
+								</div>
+							</div>							 
+							<div id="chatList">								 
+							</div>							 
+						</div>
+						<div class="card-footer">
+							<div class="input-group">
+								<div class="input-group-append">
+									<span class="input-group-text attach_btn"><i class=" "></i></span>
+								</div>
+								<input name="" id="chat" class="form-control type_msg" placeholder="Type your message..."></textarea>
+								<div class="input-group-append">
+									<span   class="input-group-text send_btn" onclick="chatLog('',$('#systemId').val());">Submit  </span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>	
+				
+				<div class="chat" style="margin-left:10px;margin-top:25px;">	
+				
+	  			  <div class="card mb-sm-3 mb-md-0 contacts_card" id="card1" style="height:325px;">
+					<div class="card-header" style="width:300px;height:50px;font-size:18px;font-weight:bold;color:#FFFFFF;">
+						<span style="font-size:23px;color:#00FFFF;margin-left:-10px;cursor:pointer;" onclick="Demo_2020702(1)">群</span>詢問熱題  
+						<span style="font-size:15px;color:#00FFFF;margin-left:-5px;">Top 5</span>						 
+						<button type="button" class="btn btn-primary  btn-sm disabled" style="margin-top:-10px;height:30px;" id="button1"></button> 
+						<i class="fas fa-angle-double-down" onclick="listOpen(1)" id="listOpen1" style="cursor: pointer;margin-left:20px;display:none;"></i> 
+						<i class="fas fa-chevron-up" onclick="listClose(1)" id="listClose1" style="cursor: pointer;margin-left:20px;"></i>						
+					</div>					 
+					<div class="card-body contacts_body" id="cardbody1" style="overflow: hidden;margin-top:-10px;"></div>					 
+					<div class="card-footer" id="card-footer1"></div>
+				</div>			
+					
+				<div class="card mb-sm-3 mb-md-0 contacts_card" id="card2" style="margin-top:10px;height:50px;"  >
+					<div class="card-header" style="width:300px;height:50px;font-size:18px;font-weight:bold;color:#FFFFFF;">
+						<span style="font-size:23px;color:#FFA500;margin-left:-10px;cursor:pointer;" onclick="Demo_2020702(2)">我</span>詢問熱題
+						<span style="font-size:15px;color:#FFA500;margin-left:-5px;">Top 5</span>
+						<button type="button" class="btn btn-primary btn-sm disabled" style="margin-top:-5px;height:30px;" id="button2"></button> 
+						<i class="fas fa-angle-double-down" onclick="listOpen(2)" id="listOpen2" style="cursor: pointer;margin-left:20px;"></i> 
+						<i class="fas fa-chevron-up" onclick="listClose(2)" id="listClose2" style="cursor: pointer;margin-left:20px;display:none;"></i>
+					</div>					
+					<div class="card-body contacts_body" id="cardbody2" style="overflow: hidden;margin-top:-10px;"></div>					 
+					<div class="card-footer" id="card-footer2" style="display:none;"></div>
+				</div>	
+
+				<div class="card mb-sm-3 mb-md-0 contacts_card" id="card3" style="margin-top:10px;height:50px;"  >
+					<div class="card-header" style="width:300px;height:50px;font-size:18px;font-weight:bold;color:#FFFFFF;">
+						<span style="font-size:23px;color:#F01F57;margin-left:-10px;cursor:pointer;" onclick="Demo_2020702(3)">火</span>熱來讚聲 
+						<span style="font-size:15px;color:#F01F57;margin-left:-5px;">Top 5</span>
+						<button type="button" class="btn btn-primary  btn-sm disabled" style="margin-top:-5px;height:30px;" id="button3"></button> 
+						<i class="fas fa-angle-double-down" onclick="listOpen(3)" id="listOpen3" style="cursor: pointer;margin-left:20px;"></i> 
+						<i class="fas fa-chevron-up" onclick="listClose(3)" id="listClose3" style="cursor: pointer;margin-left:17px;display:none;"></i>
+					</div>					
+					<div class="card-body contacts_body" id="cardbody3" style="overflow: hidden;margin-top:-10px;"></div>
+					 
+					<div class="card-footer" id="card-footer3" style="display:none;"></div>
+				</div>		
+				
+				<div class="card mb-sm-3 mb-md-0 contacts_card" id="card4" style="margin-top:10px;height:50px;"  >
+					<div class="card-header" style="width:300px;height:50px;font-size:18px;font-weight:bold;color:#FFFFFF;">
+						<span style="font-size:23px;color:#70C114;margin-left:-10px;cursor:pointer;" onclick="Demo_2020702(4)">瞎</span>回個什麼 
+						<span style="font-size:15px;color:#70C114;margin-left:-5px;">Top 5</span>
+						<button type="button" class="btn btn-primary  btn-sm disabled" style="margin-top:-5px;height:30px;" id="button4"></button>
+						<i class="fas fa-angle-double-down" onclick="listOpen(4)" id="listOpen4" style="cursor: pointer;margin-left:20px;"></i> 
+						<i class="fas fa-chevron-up" onclick="listClose(4)" id="listClose4" style="cursor: pointer;margin-left:17px;display:none;"></i>
+					</div>					
+					<div class="card-body contacts_body" id="cardbody4" style="overflow: hidden;margin-top:-10px;"></div> 					
+					 			
+					<div class="card-footer" id="card-footer4" style="display:none;"></div>
+				</div>						
+			    </div>
+			</div>
+		</div>
+	</body>
+</html>
+<script type="text/javascript">
+function Demo_2020702(no){
+	chatList = $("#chatList").html();
+	if(no == 1){		
+		newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">請問2020年，群創在4.0的關鍵進展是什麼呢？<span class="msg_time_send" style="margin-left:-60px;">'+getCurrentTime()+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>';		 
+		newChat = newChat+'<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+		newChat = newChat+'<div style="" class="msg_cotainer" title=" ">從「智慧製造」，邁向「彈性決策」；群創起飛！';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+		$("#chatList").html(chatList+newChat)
+		
+		chatList = $("#chatList").html();	
+		newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';		
+		newChat = newChat+'<a class="example-image-link" href="img/20200702_1.png" data-lightbox="example-1" data-title="從「智慧製造」，邁向「彈性決策」；群創起飛！"><img id="img_20200702_1" class="example-image" src="img/20200702_1_sub.png" alt="image-1" style="margin-top:5px;"></a>&nbsp;&nbsp;';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';		
+	}else if(no == 2){
+		newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">如果企業不能馬上跨入工業4.0，該怎麼辦呢？<span class="msg_time_send" style="margin-left:-60px;">'+getCurrentTime()+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>';		 
+		newChat = newChat+'<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+		newChat = newChat+'<div style="" class="msg_cotainer" title=" ">簡禎富 教授說：不妨先做『工業3.5』！';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+		$("#chatList").html(chatList+newChat)
+		
+		chatList = $("#chatList").html();	
+		newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';		
+		newChat = newChat+'<a class="example-image-link" href="img/20200702_2.png" data-lightbox="example-1" data-title="簡禎富 教授說：不妨先做『工業3.5』！"><img id="img_20200702_2" class="example-image" src="img/20200702_2_sub.png" alt="image-1" style="margin-top:5px;"></a>&nbsp;&nbsp;';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+	}else if(no == 3){
+		newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">彈性決策要成功，目標有什麼講究？<span class="msg_time_send" style="margin-left:-60px;">'+getCurrentTime()+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>';		 
+		newChat = newChat+'<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+		newChat = newChat+'<div style="" class="msg_cotainer" title=" ">要藉著「工具目標」，達成「根本目標」。';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+		$("#chatList").html(chatList+newChat)
+		
+		chatList = $("#chatList").html();	
+		newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';		
+		newChat = newChat+'<a class="example-image-link" href="img/20200702_3.png" data-lightbox="example-1" data-title="要藉著「工具目標」，達成「根本目標」。"><img id="img_20200702_3" class="example-image" src="img/20200702_3_sub.png" alt="image-1" style="margin-top:5px;"></a>&nbsp;&nbsp;';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+	}else{
+		newChat = '<div class="d-flex justify-content-end mb-4"><div class="msg_cotainer_send">那你看，群創推動彈性決策，會不會成功呢？<span class="msg_time_send" style="margin-left:-60px;">'+getCurrentTime()+'</span></div><div class="img_cont_msg"><img src="img/'+GENDER_ICON+'.jpg" class="rounded-circle user_img_msg"></div></div>';		 
+		newChat = newChat+'<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';
+		newChat = newChat+'<div style="" class="msg_cotainer" title=" ">楊總有決心，健宏總處有信心，群創一定成功…';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+		$("#chatList").html(chatList+newChat)
+		
+		chatList = $("#chatList").html();	
+		newChat = '<div class="d-flex justify-content-start mb-4"><div class="img_cont_msg">';
+		newChat = newChat+'<img name="robot" src="img/robot1.png" class="rounded-circle user_img_msg"></div>';		
+		newChat = newChat+'<a class="example-image-link" href="img/20200702_4.png" data-lightbox="example-1" data-title="楊總有決心，健宏總處有信心，群創一定成功…"><img id="img_20200702_4" class="example-image" src="img/20200702_4_sub.png" alt="image-1" style="margin-top:5px;"></a>&nbsp;&nbsp;';		
+		newChat = newChat+'<span class="msg_time" id="" style="margin-left:2px;">'+getCurrentTime()+'</span></div>';
+	}
+	$("#chatList").html(chatList+newChat)
+	 
+	// 依性別替換robot icon
+	if(GENDER == 1)	{
+		$('[name="robot"]').attr("src" , 'img/forMale2.jpg');			 
+	}else {
+		$('[name="robot"]').attr("src", 'img/forFemale2.jpg');			
+	}
+	// scroll bar往下移 
+	totalMessageHeight = totalMessageHeight+400;
+	$("#chatBody").animate({
+		scrollTop: totalMessageHeight				
+	}, 3000);
+}
+$(document).ready(function(){
+	$('#action_menu_btn').click(function(){
+		$('.action_menu').toggle();
+	});
+});	
+
+// 改變查詢大腦
+function changeItem(id,text){	
+	$('#'+id).html(text)  
+	
+} 
+
+// 訂閱，沒功能僅前端演示
+function subscribe(web){
+	$("#"+web).css('color', 'green');
+}
+
+// 右邊清單打開
+function listOpen(id){
+	$('#card'+id).height(325);
+	$('#listClose'+id).show()
+	$('#listOpen'+id).hide()
+	
+	$('#cardbody'+id+$("#systemId").val()).show() 
+	$('#card-footer'+id).show()
+	
+	for(i = 1 ; i <= 4 ; i++){
+		if(i != id){
+			listClose(i);
+		}
+	}
+}
+
+// 右邊清單關閉
+function listClose(id){
+	$('#card'+id).height(50);
+	$('#listClose'+id).hide()
+	$('#listOpen'+id).show()
+	
+	$('#cardbody'+id+$("#systemId").val()).hide() 
+	$('#card-footer'+id).hide()
+}
+
+// 解析url的參數
+function parse_query_string(query) {
+  var vars = query.split("&");
+  var query_string = {};
+  for (var i = 0; i < vars.length; i++) {
+	var pair = vars[i].split("=");
+	var key = decodeURIComponent(pair[0]);
+	var value = decodeURIComponent(pair[1]);
+	if (typeof query_string[key] === "undefined") {
+	  query_string[key] = decodeURIComponent(value);
+	} else if (typeof query_string[key] === "string") {
+	  var arr = [query_string[key], decodeURIComponent(value)];
+	  query_string[key] = arr;
+	} else {
+	  query_string[key].push(decodeURIComponent(value));
+	}
+  }
+  return query_string;
+}
+
+// 取得時間1
+function getCurrentTime(){
+	var today = new Date();
+	
+	m = today.getMonth()+1;
+	if(m < 10) m = '0'+m;
+	d = today.getDate();
+	if(d < 10) d = '0'+d;
+    h = today.getHours();
+	if(h < 10) h = '0'+h;
+	mi = today.getMinutes();
+	if(mi < 10) mi = '0'+mi;
+	s = today.getSeconds();
+	if(s < 10) s = '0'+s;
+	return m+'-'+d+' '+h+':'+mi+':'+s;
+}	
+
+// 取得時間2
+function getCurrentTime2(){
+  var today = new Date();
+  y=today.getFullYear().toString().substr(2,2);
+  m=addZero(today.getMonth()+1, 2);
+  d=addZero(today.getDate(), 2);
+  h=addZero(today.getHours(), 2);
+  mi=addZero(today.getMinutes(), 2);
+  s=addZero(today.getSeconds(), 2);
+  return y+'-'+m+'-'+d+'-'+h+':'+mi+':'+s;
+}
+
+// 補0
+function addZero(x,n) {
+ while (x.toString().length < n) {
+   x = "0" + x;
+ }
+ return x;
+}
+
+</script> 

@@ -1,0 +1,5 @@
+tensorflow-hub==0.11.0
+tensorflow==2.4.1
+tensorflow-text==2.4.3
+monpa==0.2.5.1
+scikit-learn==0.24.2 
